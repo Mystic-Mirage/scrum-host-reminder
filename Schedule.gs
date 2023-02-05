@@ -1,81 +1,87 @@
-const SCHEDULE_CACHE_KEY = "schedule-data";
+const DAY_MS = 86400000;
 
 
 /**
- * @returns {Object}
+ * @typedef {Object} ScheduleData
+ * @property {Date} startPoint
+ * @property {Date} timeAt
+ * @property {string} timeZone
+ * @property {number} triggerUid
+ * @property {boolean[]} schedule
  */
-function getSchedule() {
-  let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("schedule");
+
+
+/**
+ * @param {SpreadsheetApp.Sheet} sheet
+ * @returns {ScheduleData}
+ */
+function getScheduleData(sheet) {
   let rows = sheet.getDataRange().getValues();
 
-  let [startPoint, timeAt, timeZone] = rows[0];
+  let [startPoint, timeAt, timeZone, triggerUid] = rows[0].slice(5);
 
   let schedule = [];
   for (let i = 1; i < rows.length; i++) {
-    schedule.push(...rows[i]);
+    let row = rows[i].slice(5);
+    if (!row[0]) {
+      break;
+    }
+    schedule.push(...row);
   }
 
-  return {startPoint, timeAt, timeZone, schedule};
+  return {startPoint, timeAt, timeZone, triggerUid, schedule};
 }
 
 
 /**
- * @returns {Object}
- */
-function getScheduleCached() {
-  let cache = CacheService.getScriptCache();
-  let cached = cache.get(SCHEDULE_CACHE_KEY);
-
-  if (cached === null) {
-    var schedule = getSchedule();
-    cache.put(SCHEDULE_CACHE_KEY, JSON.stringify(schedule));
-  } else {
-    var schedule = JSON.parse(cached);
-    schedule.startPoint = new Date(schedule.startPoint);
-    schedule.timeAt = new Date(schedule.timeAt);
-  }
-
-  return schedule;
-}
-
-
-/**
- * @param {Date} now
- * @param {Date} startPoint
- * @param {boolean[]} schedule
- * @returns {boolean}
- */
-function isDay(now, startPoint, schedule) {
-  let days = Math.floor((now.getTime() - startPoint.getTime()) / 86400000);
-  let day = days % schedule.length;
-  let active = schedule[day];
-  return active;
-}
-
-
-/**
- * @param {Date} now
- * @param {Date} timeAt
  * @param {string} timeZone
- * @returns {boolean}
+ * @param {number} year
+ * @param {number} monthIndex
+ * @param {number} day
+ * @param {number} hour
+ * @param {number} minute
+ * @returns {Date}
  */
-function isTime(now, timeAt, timeZone) {
-  let nowTz = new Date(now.toLocaleString("en-UK", {timeZone: timeZone}));
-  return timeAt.getHours() === nowTz.getHours() && timeAt.getMinutes() === nowTz.getMinutes();
+function tzDate(timeZone, year, monthIndex, day, hour, minute) {
+  let date = new Date(Date.UTC(year, monthIndex, day, hour, minute));
+
+  let utcDate = new Date(date.toLocaleString("en-US", {timeZone: "UTC"}));
+  let tzDate = new Date(date.toLocaleString("en-US", {timeZone: timeZone}));
+  let offset = utcDate.getTime() - tzDate.getTime();
+
+  date.setTime(date.getTime() + offset);
+
+  return date;
 }
 
 
 /**
- * @returns {boolean}
+ * @param {ScheduleData} scheduleData
+ * @returns {Date}
  */
-function isMeetingTime() {
+function getNextMeeting(scheduleData) {
   let now = new Date();
+  let startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
 
-  let schedule = getScheduleCached();
+  let schedule = [...scheduleData.schedule, ...scheduleData.schedule];
+  let dayShift = 0;
+  for (let i = startDay; i < schedule.length; i++) {
+    if (schedule[i]) {
+      let date = new Date(now.getTime() + dayShift);
+      let dateAt = tzDate(scheduleData.timeZone, date.getFullYear(), date.getMonth(), date.getDate(), scheduleData.timeAt.getHours(), scheduleData.timeAt.getMinutes());
 
-  let dayMatch = isDay(now, schedule.startPoint, schedule.schedule);
-  let timeMatch = isTime(now, schedule.timeAt, schedule.timeZone);
-  let meetingTime = dayMatch && timeMatch;
+      if (dateAt > now) {
+        return dateAt;
+      }
+    }
+    dayShift += DAY_MS;
+  }
+}
 
-  return meetingTime;
+
+function debugGetNextMeeting() {
+  let sheet = SpreadsheetApp.getActive().getSheets()[0];
+  let scheduleData = getScheduleData(sheet);
+  let nextMeeting = getNextMeeting(scheduleData);
+  console.log(nextMeeting);
 }

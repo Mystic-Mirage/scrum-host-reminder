@@ -56,13 +56,76 @@ function postApi(path, token, data) {
 
 
 /**
- * @param {string} slackId
- * @param {string} [responseUrl]
+ * @parameter {string} channelId
+ * @parameter {string} token
+ * @parameter {string} [nextCursor]
+ * @returns {Object[]}
  */
-function postMessage(slackId, responseUrl) {
+function readHistory(channelId, token, nextCursor) {
+  let url = getApiUrl("conversations.history") + "?channel=" + channelId;
+  if (nextCursor) {
+    url += "&cursor=" + nextCursor;
+  }
+  let params = prepareFetchParams(token);
+
+  let response = UrlFetchApp.fetch(url, params);
+  let result = JSON.parse(response);
+  return result;
+}
+
+
+/**
+ * @param {string} channelId
+ * @param {Object} props
+ */
+function deleteLastMessage(channelId, props) {
+  let nextCursor;
+
+  for (let repeat = 0; repeat < 10; repeat++) {
+    let history = readHistory(channelId, props.SLACK_TOKEN, nextCursor);
+    for (let i = 0; i < history.messages.length; i++) {
+      let message = history.messages[i];
+      if (message.app_id === props.SLACK_APP_ID) {
+        let data = {
+          channel: channelId,
+          ts: message.ts,
+        }
+
+        postApi("chat.delete", props.SLACK_TOKEN, data);
+        return;
+      }
+    }
+
+    if (!history.has_more) break;
+
+    nextCursor = history.response_metadata.next_cursor;
+  }
+}
+
+
+/**
+ * @param {string} responseUrl
+ */
+function deleteOriginalMessage(responseUrl) {
   let props = getScriptProperties();
   let data = {
-    channel: props.SLACK_CHANNEL_ID,
+    delete_original: true,
+  };
+  post(responseUrl, props.SLACK_TOKEN, data);
+}
+
+
+/**
+ * @param {string} channelId
+ * @param {string} slackId
+ * @param {Object} params
+ * @param {string} [params.channelId]
+ * @param {string} [params.responseUrl]
+ */
+function postMessage(slackId, params) {
+  let props = getScriptProperties();
+
+  let data = {
     blocks: [
       {
         type: "section",
@@ -133,67 +196,12 @@ function postMessage(slackId, responseUrl) {
     ]
   };
 
-  if (responseUrl) {
+  if (params.responseUrl) {
     data.replace_original = true;
-    post(responseUrl, props.SLACK_TOKEN, data);
-  } else {
+    post(params.responseUrl, props.SLACK_TOKEN, data);
+  } else if (params.channelId) {
+    deleteLastMessage(params.channelId, props);
+    data.channel = params.channelId;
     postApi("chat.postMessage", props.SLACK_TOKEN, data);
   }
-}
-
-
-/**
- * @parameter {string} channelId
- * @parameter {string} token
- * @parameter {string} [nextCursor]
- * @returns {Object[]}
- */
-function readHistory(channelId, token, nextCursor) {
-  let url = getApiUrl("conversations.history") + "?channel=" + channelId;
-  if (nextCursor) {
-    url += "&cursor=" + nextCursor;
-  }
-  let params = prepareFetchParams(token);
-
-  let response = UrlFetchApp.fetch(url, params);
-  let result = JSON.parse(response);
-  return result;
-}
-
-
-function deleteLastMessage() {
-  let props = getScriptProperties();
-
-  let nextCursor;
-  for (let repeat = 0; repeat < 10; repeat++) {
-    let history = readHistory(props.SLACK_CHANNEL_ID, props.SLACK_TOKEN, nextCursor);
-    for (let i = 0; i < history.messages.length; i++) {
-      let message = history.messages[i];
-      if (message.app_id === props.SLACK_APP_ID) {
-        let data = {
-          channel: props.SLACK_CHANNEL_ID,
-          ts: message.ts,
-        }
-
-        postApi("chat.delete", props.SLACK_TOKEN, data);
-        return;
-      }
-    }
-
-    if (!history.has_more) break;
-
-    nextCursor = history.response_metadata.next_cursor;
-  }
-}
-
-
-/**
- * @param {string} responseUrl
- */
-function deleteOriginalMessage(responseUrl) {
-  let props = getScriptProperties();
-  let data = {
-    delete_original: true,
-  };
-  post(responseUrl, props.SLACK_TOKEN, data);
 }

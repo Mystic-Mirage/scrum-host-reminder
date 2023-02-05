@@ -1,14 +1,15 @@
 /**
- * @returns {Object}
+ * @typedef {Object} Host
+ * @property {number} idx
+ * @property {string} slackId
+ * @property {boolean} active
+ * @property {Date} timestamp
  */
-function getSheet() {
-  return SpreadsheetApp.getActiveSpreadsheet().getSheetByName("hosts");
-}
 
 
 /**
- * @param {Object} sheet
- * @returns {Object[]}
+ * @param {SpreadsheetApp.Sheet} sheet
+ * @returns {Host[]}
  */
 function getHosts(sheet) {
   let rows = sheet.getDataRange().getValues();
@@ -33,31 +34,29 @@ function getHosts(sheet) {
 
 
 /**
- * @returns {Object}
+ * @param {SpreadsheetApp.Sheet} sheet
+ * @returns {Host}
  */
-function nextHost() {
+function nextHost(sheet) {
   let now = new Date();
 
-  let sheet = getSheet();
   let hosts = getHosts(sheet);
 
-  let next = null;
   for (let i = 0; i < hosts.length; i++) {
     let host = hosts[i];
     sheet.getRange(host.idx, 4).setValue(now);
 
     if (host.active) {
-      next = host;
-      break;
+      return host;
     }
   }
-
-  return next;
 }
 
 
-function skipMeeting() {
-  let sheet = getSheet()
+/**
+ * @param {SpreadsheetApp.Sheet} sheet
+ */
+function skipMeeting(sheet) {
   let hosts = getHosts(sheet);
 
   let host = hosts[hosts.length - 1];
