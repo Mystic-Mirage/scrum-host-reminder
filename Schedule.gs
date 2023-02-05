@@ -60,6 +60,8 @@ function tzDate(timeZone, year, monthIndex, day, hour, minute) {
  * @returns {Date}
  */
 function getNextMeeting(scheduleData) {
+  if (!scheduleData.timeAt) return;
+
   let now = new Date();
   let startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
 
@@ -80,7 +82,7 @@ function getNextMeeting(scheduleData) {
 
 
 function debugGetNextMeeting() {
-  let sheet = SpreadsheetApp.getActive().getSheets()[0];
+  let sheet = SpreadsheetApp.getActive().getSheets()[1];
   let scheduleData = getScheduleData(sheet);
   let nextMeeting = getNextMeeting(scheduleData);
   console.log(nextMeeting);

@@ -47,15 +47,16 @@ function replaceTrigger(sheet) {
     }
   }
 
+  let range = sheet.getRange(...TRIGGER_UID_RANGE);
   if (nextMeeting = getNextMeeting(scheduleData)) {
     let trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
       .timeBased()
       .at(nextMeeting)
       .create();
 
-    let range = sheet.getRange(...TRIGGER_UID_RANGE);
     range.setValue(trigger.getUniqueId());
-    range.setNote("Stored trigger UID. DO NOT REMOVE!");
+  } else {
+    range.clearContent();
   }
 }
 
