@@ -29,6 +29,23 @@ function findSheet(triggerUid) {
 
 
 /**
+ * @param {number} triggerUid
+ */
+function deleteTrigger(triggerUid) {
+  let triggers = ScriptApp.getProjectTriggers();
+
+  for (let i = 0; i < triggers.length; i++) {
+    let trigger = triggers[i];
+
+    if (trigger.getUniqueId() === triggerUid) {
+      ScriptApp.deleteTrigger(trigger);
+      break;
+    }
+  }
+}
+
+
+/**
  * @param {SpreadsheetApp.Sheet} sheet
  */
 function replaceTrigger(sheet) {
@@ -36,16 +53,7 @@ function replaceTrigger(sheet) {
 
   let scheduleData = getScheduleData(sheet);
 
-  let triggers = ScriptApp.getProjectTriggers();
-
-  for (let i = 0; i < triggers.length; i++) {
-    let trigger = triggers[i];
-
-    if (trigger.getUniqueId() === scheduleData.triggerUid) {
-      ScriptApp.deleteTrigger(trigger);
-      break;
-    }
-  }
+  deleteTrigger(scheduleData.triggerUid);
 
   let range = sheet.getRange(...TRIGGER_UID_RANGE);
   if (nextMeeting = getNextMeeting(scheduleData)) {
@@ -74,6 +82,8 @@ function onTimeDrivenEvent(e) {
   if (sheet = findSheet(e.triggerUid)) {
     nextHostMessage(sheet);
     replaceTrigger(sheet);
+  } else {
+    deleteTrigger(e.triggerUid);
   }
 }
 
