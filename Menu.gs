@@ -15,6 +15,7 @@ function getStartOfWeek() {
 function newSheet(channelId) {
   let spreadsheet = SpreadsheetApp.getActive();
   let sheet = spreadsheet.insertSheet();
+  sheet.protect().setDomainEdit(false);
   let totalSheets = spreadsheet.getNumSheets();
   spreadsheet.moveActiveSheet(totalSheets);
   sheet.setName(channelId);
