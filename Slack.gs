@@ -258,20 +258,6 @@ function postMessage(slackId, params) {
 }
 
 
-/**
- * @param {string} channelId
- */
-function inviteMyself(channelId) {
-  let props = getScriptProperties();
-
-  let data = {
-    channel: channelId,
-    users: [props.SLACK_APP_ID],
-  }
-  postApi("conversatons.invite", props.SLACK_TOKEN, data);
-}
-
-
 function debugGetMembers() {
   let sheet = SpreadsheetApp.getActive().getSheets()[1];
   console.log(getMembers(sheet.getName()));

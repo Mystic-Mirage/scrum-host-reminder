@@ -54,8 +54,6 @@ function newSheet(channelId) {
       ]
     );
 
-  inviteMyself(channelId);
-
   if (members = getMembers(channelId)) {
     for (let i = 0; i < members.length; i++) {
       let userId = members[i];
