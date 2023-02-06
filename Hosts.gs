@@ -20,7 +20,9 @@ function getHosts(sheet) {
     let idx = i +1;
     let [name, slackId, active, timestamp] = rows[i];
     let host = {idx, name, slackId, active, timestamp};
-    hosts.push(host);
+    if (host.slackId) {
+      hosts.push(host);
+    }
   }
 
   hosts.sort(function(a, b) {
