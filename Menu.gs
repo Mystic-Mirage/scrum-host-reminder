@@ -32,7 +32,10 @@ function newSheet(channelId) {
 
   let timeRange = sheet.getRange(1, 7);
   timeRange.setNumberFormat("hh:mm");
-  let timeValidation = SpreadsheetApp.newDataValidation().requireDate().build();
+  let timeValidation = SpreadsheetApp.newDataValidation()
+    .requireDate()
+    .setAllowInvalid(false)
+    .build();
   timeRange.setDataValidation(timeValidation);
   let timeFormatting = SpreadsheetApp.newConditionalFormatRule()
     .whenCellEmpty()
