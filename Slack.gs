@@ -274,6 +274,10 @@ function joinChannel(channelId) {
 }
 
 
+/**
+ * @param {string} channelId
+ * @returns {boolean}
+ */
 function checkChannel(channelId) {
   let props = getScriptProperties();
 
