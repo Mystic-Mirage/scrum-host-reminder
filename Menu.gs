@@ -70,6 +70,12 @@ function newSheet(channelId) {
       }
     }
   }
+
+  let hosts = getHosts(sheet, "name");
+  for (let i = 0; i < hosts.length; i++) {
+    let host = hosts[i];
+    sheet.getRange(i + 1, 1, 1, 2).setValues([[host.name, host.slackId]]);
+  }
 }
 
 

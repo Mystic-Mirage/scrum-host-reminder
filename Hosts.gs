@@ -1,6 +1,7 @@
 /**
  * @typedef {Object} Host
  * @property {number} idx
+ * @property {string} name
  * @property {string} slackId
  * @property {boolean} active
  * @property {Date} timestamp
@@ -9,9 +10,10 @@
 
 /**
  * @param {SpreadsheetApp.Sheet} sheet
+ * @param {string} sortKey
  * @returns {Host[]}
  */
-function getHosts(sheet) {
+function getHosts(sheet, sortKey = "timestamp") {
   let rows = sheet.getDataRange().getValues();
 
   let hosts = [];
@@ -25,11 +27,11 @@ function getHosts(sheet) {
     }
   }
 
-  hosts.sort(function(a, b) {
-    if (a.timestamp < b.timestamp) return -1;
-    if (a.timestamp > b.timestamp) return 1;
+  hosts.sort(function (a, b) {
+    if (a[sortKey] < b[sortKey]) return -1;
+    if (a[sortKey] > b[sortKey]) return 1;
     return 0;
-  })
+  });
 
   return hosts;
 }
