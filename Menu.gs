@@ -30,6 +30,7 @@ function newSheet(channelId) {
   sheet.getRange(1, 6).setValue(startOfWeek).setNumberFormat("yyyy-mm-dd");
 
   let timeRange = sheet.getRange(1, 7);
+  timeRange.setNumberFormat("hh:mm");
   let timeValidation = SpreadsheetApp.newDataValidation().requireDate().build();
   timeRange.setDataValidation(timeValidation);
   let timeFormatting = SpreadsheetApp.newConditionalFormatRule()
@@ -40,7 +41,10 @@ function newSheet(channelId) {
   sheet.setConditionalFormatRules([timeFormatting]);
 
   let tzRangeSource = spreadsheet.getRange("timezones!A:A");
-  let tzValidation = SpreadsheetApp.newDataValidation().requireValueInRange(tzRangeSource, false).build();
+  let tzValidation = SpreadsheetApp.newDataValidation()
+    .requireValueInRange(tzRangeSource, false)
+    .setAllowInvalid(false)
+    .build();
   sheet.getRange(1, 8).setDataValidation(tzValidation).setValue("UTC");
 
   sheet.getRange(...TRIGGER_UID_RANGE).setNote("Stored trigger UID. DO NOT REMOVE!");
@@ -55,11 +59,12 @@ function newSheet(channelId) {
     );
 
   if (members = getMembers(channelId)) {
+    let rowNum = 0;
     for (let i = 0; i < members.length; i++) {
       let userId = members[i];
       let user = getUserInfo(members[i]);
       if (!user.is_bot) {
-        let rowNum = i + 1;
+        rowNum++;
         sheet.getRange(rowNum, 1, 1, 2).setValues([[user.real_name, userId]]);
         sheet.getRange(rowNum, 3).insertCheckboxes();
       }
@@ -72,6 +77,8 @@ function addChannel() {
   let ui = SpreadsheetApp.getUi();
   let result = ui.prompt("Enter Slack channel ID");
   let channelId = result.getResponseText();
+
+  if (!channelId) return;
 
   if (!checkChannel(channelId)) {
     ui.alert("Wrong channel ID", "Note: add the bot first if a channel is private", ui.ButtonSet.OK);
