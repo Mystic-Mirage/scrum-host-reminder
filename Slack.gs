@@ -82,7 +82,7 @@ function getApi(path, argString, token) {
 function readHistory(channelId, token, nextCursor) {
   let argString = "?channel=" + channelId;
   if (nextCursor) {
-    url += "&cursor=" + nextCursor;
+    argString += "&cursor=" + nextCursor;
   }
 
   return getApi("conversations.history", argString, token);
