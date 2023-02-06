@@ -47,7 +47,16 @@ function newSheet(channelId) {
     .build();
   sheet.getRange(1, 8).setDataValidation(tzValidation).setValue("UTC");
 
-  sheet.getRange(...TRIGGER_UID_RANGE).setNote("Stored trigger UID. DO NOT REMOVE!");
+  sheet.getRange(1, 6, 1, 4).setNotes(
+    [
+      [
+        "Start point",
+        "Meeting time",
+        "Timezone",
+        "Stored trigger UID. DO NOT REMOVE!"
+      ]
+    ]
+  );
 
   sheet.getRange(2, 6, 2, 7)
     .insertCheckboxes()
