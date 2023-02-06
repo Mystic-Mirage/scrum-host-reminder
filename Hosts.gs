@@ -17,9 +17,8 @@ function getHosts(sheet, sortKey = "timestamp") {
   let rows = sheet.getDataRange().getValues();
 
   let hosts = [];
-
   for (let i = 0; i < rows.length; i++) {
-    let idx = i +1;
+    let idx = i + 1;
     let [name, slackId, active, timestamp] = rows[i];
     let host = {idx, name, slackId, active, timestamp};
     if (host.slackId) {
@@ -46,8 +45,7 @@ function nextHost(sheet) {
 
   let hosts = getHosts(sheet);
 
-  for (let i = 0; i < hosts.length; i++) {
-    let host = hosts[i];
+  for (let host of hosts) {
     sheet.getRange(host.idx, 4).setValue(now);
 
     if (host.active) {

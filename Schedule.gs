@@ -21,8 +21,8 @@ function getScheduleData(sheet) {
   let [startPoint, timeAt, timeZone, triggerUid] = rows[0].slice(5);
 
   let schedule = [];
-  for (let i = 1; i < rows.length; i++) {
-    let row = rows[i].slice(5);
+  for (let row of rows.slice(1)) {
+    row = row.slice(5);
     if (row[0] === "") {
       break;
     }

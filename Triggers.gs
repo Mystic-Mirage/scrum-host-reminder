@@ -19,8 +19,7 @@ function nextHostMessage(sheet, responseUrl) {
  */
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
-  for (let i = 0; i < sheets.length; i++) {
-    let sheet = sheets[i];
+  for (let sheet of sheets) {
     if (sheet.getRange(...TRIGGER_UID_RANGE).getValue() === triggerUid) {
       return sheet;
     }
@@ -34,9 +33,7 @@ function findSheet(triggerUid) {
 function deleteTrigger(triggerUid) {
   let triggers = ScriptApp.getProjectTriggers();
 
-  for (let i = 0; i < triggers.length; i++) {
-    let trigger = triggers[i];
-
+  for (let trigger of triggers) {
     if (trigger.getUniqueId() === triggerUid) {
       ScriptApp.deleteTrigger(trigger);
       break;

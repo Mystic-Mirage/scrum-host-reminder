@@ -136,8 +136,7 @@ function deleteLastMessage(channelId, token, appId) {
 
     if (!history.messages) return;
 
-    for (let i = 0; i < history.messages.length; i++) {
-      let message = history.messages[i];
+    for (let message of history.messages) {
       if (message.app_id === appId) {
         let data = {
           channel: channelId,

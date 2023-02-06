@@ -60,9 +60,8 @@ function newSheet(channelId) {
 
   if (members = getMembers(channelId)) {
     let rowNum = 0;
-    for (let i = 0; i < members.length; i++) {
-      let userId = members[i];
-      let user = getUserInfo(members[i]);
+    for (let userId of members) {
+      let user = getUserInfo(userId);
       if (!user.is_bot) {
         rowNum++;
         sheet.getRange(rowNum, 1, 1, 2).setValues([[user.real_name, userId]]);
@@ -72,10 +71,11 @@ function newSheet(channelId) {
   }
 
   let hosts = getHosts(sheet, "name");
-  for (let i = 0; i < hosts.length; i++) {
-    let host = hosts[i];
-    sheet.getRange(i + 1, 1, 1, 2).setValues([[host.name, host.slackId]]);
+  let hostsValues = [];
+  for (let host of hosts) {
+    hostsValues.push([host.name, host.slackId]);
   }
+  sheet.getRange(1, 1, hostsValues.length, 2).setValues(hostsValues);
 }
 
 
