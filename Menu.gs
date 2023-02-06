@@ -58,6 +58,8 @@ function newSheet(channelId) {
     ]
   );
 
+  sheet.getRange(...TRIGGER_UID_RANGE).protect().setWarningOnly(true);
+
   sheet.getRange(2, 6, 2, 7)
     .insertCheckboxes()
     .setValues(
