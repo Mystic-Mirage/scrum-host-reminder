@@ -21,6 +21,7 @@ function newSheet(channelId) {
 
   sheet.setColumnWidth(1, 200);
   sheet.setColumnWidth(4, 150);
+  sheet.getRange(1, 4, sheet.getMaxRows()).setNumberFormat("yyyy-mm-dd hh:mm:ss")
   sheet.setColumnWidth(5, 20);
 
   sheet.getRange(1, 5, sheet.getMaxRows()).setBackground("#efefef");
@@ -53,14 +54,18 @@ function newSheet(channelId) {
       ]
     );
 
-  let members = getMembers(channelId);
+  inviteMyself(channelId);
 
-  for (let i = 0; i < members.length; i++) {
-    let userId = members[i];
-    let name = getUserName(members[i]);
-    let rowNum = i + 1;
-    sheet.getRange(rowNum, 1, 1, 2).setValues([[name, userId]]);
-    sheet.getRange(rowNum, 3).insertCheckboxes().setValue(true);
+  if (members = getMembers(channelId)) {
+    for (let i = 0; i < members.length; i++) {
+      let userId = members[i];
+      let user = getUserInfo(members[i]);
+      if (!user.is_bot) {
+        let rowNum = i + 1;
+        sheet.getRange(rowNum, 1, 1, 2).setValues([[user.real_name, userId]]);
+        sheet.getRange(rowNum, 3).insertCheckboxes().setValue(true);
+      }
+    }
   }
 }
 

@@ -47,6 +47,7 @@ function post(url, token, data) {
 
 /**
  * @param {string} path
+ * @param {string} token
  * @param {Object} data
  */
 function postApi(path, token, data) {
@@ -98,21 +99,27 @@ function getMembers(channelId) {
 
   let argString = "?channel=" + channelId + "&limit=20"
   let members = getApi("conversations.members", argString, props.SLACK_TOKEN).members;
-  return members;
 
+  return members;
 }
 
 
 /**
- * @param {string} userId
- * @returns {string}
+ * @typedef {Object} User
+ * @property {string} real_name
+ * @property {boolean} is_bot
  */
-function getUserName(userId) {
+
+
+/**
+ * @param {string} userId
+ * @returns {User}
+ */
+function getUserInfo(userId) {
   let props = getScriptProperties();
 
   let user = getApi("users.info", "?user=" + userId, props.SLACK_TOKEN).user;
-  let realName = user.real_name;
-  return realName;
+  return user;
 }
 
 
@@ -248,6 +255,20 @@ function postMessage(slackId, params) {
     data.channel = params.channelId;
     postApi("chat.postMessage", props.SLACK_TOKEN, data);
   }
+}
+
+
+/**
+ * @param {string} channelId
+ */
+function inviteMyself(channelId) {
+  let props = getScriptProperties();
+
+  let data = {
+    channel: channelId,
+    users: [props.SLACK_APP_ID],
+  }
+  postApi("conversatons.invite", props.SLACK_TOKEN, data);
 }
 
 
