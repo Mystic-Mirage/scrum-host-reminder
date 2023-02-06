@@ -97,7 +97,7 @@ function readHistory(channelId, token, nextCursor) {
 function getMembers(channelId) {
   let props = getScriptProperties();
 
-  let argString = "?channel=" + channelId + "&limit=20"
+  let argString = "?channel=" + channelId + "&limit=35"
   let members = getApi("conversations.members", argString, props.SLACK_TOKEN).members;
 
   return members;
