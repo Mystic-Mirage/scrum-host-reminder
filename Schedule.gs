@@ -23,7 +23,7 @@ function getScheduleData(sheet) {
   let schedule = [];
   for (let i = 1; i < rows.length; i++) {
     let row = rows[i].slice(5);
-    if (!row[0]) {
+    if (row[0] === "") {
       break;
     }
     schedule.push(...row);
