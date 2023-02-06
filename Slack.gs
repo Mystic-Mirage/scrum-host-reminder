@@ -183,7 +183,7 @@ function postMessage(slackId, params) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: "Hello! Today's daily meeting host is <@" + slackId + ">",
+          text: "Hello!\nThis is a friendly reminder that <@" + slackId + "> is hosting today's stand-up meeting",
         }
       },
       {
