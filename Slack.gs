@@ -133,6 +133,9 @@ function deleteLastMessage(channelId, token, appId) {
 
   for (let repeat = 0; repeat < 10; repeat++) {
     let history = readHistory(channelId, token, nextCursor);
+
+    if (!history.messages) return;
+
     for (let i = 0; i < history.messages.length; i++) {
       let message = history.messages[i];
       if (message.app_id === appId) {
@@ -254,6 +257,20 @@ function postMessage(slackId, params) {
     data.channel = params.channelId;
     postApi("chat.postMessage", props.SLACK_TOKEN, data);
   }
+}
+
+
+/**
+ * @param {string} channelId
+ */
+function joinChannel(channelId) {
+  let props = getScriptProperties();
+
+  let data = {
+    channel: channelId,
+  }
+
+  postApi("conversations.join", props.SLACK_TOKEN, data);
 }
 
 

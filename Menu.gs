@@ -13,12 +13,6 @@ function getStartOfWeek() {
  * @param {string} channelId
  */
 function newSheet(channelId) {
-  if (!checkChannel(channelId)) {
-    let ui = SpreadsheetApp.getUi()
-    ui.alert("Wrong channel ID", "Note: add the bot first if a channel is private", ui.ButtonSet.OK);
-    return;
-  }
-
   let spreadsheet = SpreadsheetApp.getActive();
   let sheet = spreadsheet.insertSheet();
   let totalSheets = spreadsheet.getNumSheets();
@@ -78,7 +72,14 @@ function addChannel() {
   let ui = SpreadsheetApp.getUi();
   let result = ui.prompt("Enter Slack channel ID");
   let channelId = result.getResponseText();
+
+  if (!checkChannel(channelId)) {
+    ui.alert("Wrong channel ID", "Note: add the bot first if a channel is private", ui.ButtonSet.OK);
+    return;
+  }
+
   newSheet(channelId);
+  joinChannel(channelId);
 }
 
 
