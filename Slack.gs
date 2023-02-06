@@ -123,7 +123,6 @@ function getUserInfo(userId) {
 }
 
 
-
 /**
  * @param {string} channelId
  * @param {string} token
@@ -255,6 +254,14 @@ function postMessage(slackId, params) {
     data.channel = params.channelId;
     postApi("chat.postMessage", props.SLACK_TOKEN, data);
   }
+}
+
+
+function checkChannel(channelId) {
+  let props = getScriptProperties();
+
+  let result = getApi("conversations.info", "?channel=" + channelId, props.SLACK_TOKEN);
+  return result.ok;
 }
 
 

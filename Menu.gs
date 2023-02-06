@@ -13,6 +13,12 @@ function getStartOfWeek() {
  * @param {string} channelId
  */
 function newSheet(channelId) {
+  if (!checkChannel(channelId)) {
+    let ui = SpreadsheetApp.getUi()
+    ui.alert("Wrong channel ID", "Note: add the bot first if a channel is private", ui.ButtonSet.OK);
+    return;
+  }
+
   let spreadsheet = SpreadsheetApp.getActive();
   let sheet = spreadsheet.insertSheet();
   let totalSheets = spreadsheet.getNumSheets();
@@ -61,7 +67,7 @@ function newSheet(channelId) {
       if (!user.is_bot) {
         let rowNum = i + 1;
         sheet.getRange(rowNum, 1, 1, 2).setValues([[user.real_name, userId]]);
-        sheet.getRange(rowNum, 3).insertCheckboxes().setValue(true);
+        sheet.getRange(rowNum, 3).insertCheckboxes();
       }
     }
   }
