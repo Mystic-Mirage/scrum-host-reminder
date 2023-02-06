@@ -6,10 +6,10 @@ const TRIGGER_UID_RANGE = [1, 9];
  * @param {string} [responseUrl]
  */
 function nextHostMessage(sheet, responseUrl) {
-  let host = nextHost(sheet);
-  if (host) {
+  let [next, afterNext] = nextHosts(sheet);
+  if (next) {
     let channelId = sheet.getName();
-    postMessage(host.slackId, {channelId, responseUrl});
+    postMessage(next, afterNext, {channelId, responseUrl});
   }
 }
 

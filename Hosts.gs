@@ -38,20 +38,27 @@ function getHosts(sheet, sortKey = "timestamp") {
 
 /**
  * @param {SpreadsheetApp.Sheet} sheet
- * @returns {Host}
+ * @returns {Host[]}
  */
-function nextHost(sheet) {
+function nextHosts(sheet) {
   let now = new Date();
 
+  let next, afterNext;
+
   let hosts = getHosts(sheet);
-
   for (let host of hosts) {
-    sheet.getRange(host.idx, 4).setValue(now);
-
     if (host.active) {
-      return host;
+      if (next) {
+        afterNext = host;
+        break;
+      } {
+        next = host;
+      }
     }
+    sheet.getRange(host.idx, 4).setValue(now);
   }
+
+  return [next, afterNext];
 }
 
 

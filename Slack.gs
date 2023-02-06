@@ -164,12 +164,13 @@ function deleteOriginalMessage(responseUrl) {
 
 
 /**
- * @param {string} slackId
+ * @param {Host} next
+ * @param {Host} afterNext
  * @param {Object} params
  * @param {string} [params.channelId]
  * @param {string} [params.responseUrl]
  */
-function postMessage(slackId, params) {
+function postMessage(next, afterNext, params) {
   let props = getScriptProperties();
 
   let data = {
@@ -178,7 +179,9 @@ function postMessage(slackId, params) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: "Hello!\nThis is a friendly reminder that <@" + slackId + "> is hosting today's stand-up meeting",
+          text: "Hello!\n\n" +
+                `This is a friendly reminder that <@${next.slackId}> is hosting today's stand-up meeting` +
+                (afterNext ? `\n\n_Next time it's *${afterNext.name}*'${afterNext.name.endsWith("s") ? "" : "s"} turn_` : "")
         }
       },
       {
