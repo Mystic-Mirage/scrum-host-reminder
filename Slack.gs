@@ -16,6 +16,7 @@ function apiUrl(path) {
 
 
 /**
+ * @param {string} token
  * @param {Object} [data]
  * @returns {Object}
  */
@@ -30,6 +31,7 @@ function prepareFetchParams(token, data) {
 
 /**
  * @param {string} url
+ * @param {string} token
  * @param {Object} data
  */
 function post(url, token, data) {
@@ -67,8 +69,7 @@ function getApi(path, argString, token) {
   let params = prepareFetchParams(token);
 
   let response = UrlFetchApp.fetch(url, params);
-  let result = JSON.parse(response);
-  return result;
+  return JSON.parse(response);
 }
 
 
@@ -84,9 +85,7 @@ function readHistory(channelId, token, nextCursor) {
     url += "&cursor=" + nextCursor;
   }
 
-  let result = getApi("conversations.history", argString, token);
-
-  return result;
+  return getApi("conversations.history", argString, token);
 }
 
 
@@ -98,9 +97,7 @@ function getMembers(channelId) {
   let props = getScriptProperties();
 
   let argString = "?channel=" + channelId + "&limit=35"
-  let members = getApi("conversations.members", argString, props.SLACK_TOKEN).members;
-
-  return members;
+  return getApi("conversations.members", argString, props.SLACK_TOKEN).members;
 }
 
 
@@ -118,8 +115,7 @@ function getMembers(channelId) {
 function getUserInfo(userId) {
   let props = getScriptProperties();
 
-  let user = getApi("users.info", "?user=" + userId, props.SLACK_TOKEN).user;
-  return user;
+  return getApi("users.info", "?user=" + userId, props.SLACK_TOKEN).user;
 }
 
 
@@ -168,7 +164,6 @@ function deleteOriginalMessage(responseUrl) {
 
 
 /**
- * @param {string} channelId
  * @param {string} slackId
  * @param {Object} params
  * @param {string} [params.channelId]

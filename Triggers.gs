@@ -6,7 +6,8 @@ const TRIGGER_UID_RANGE = [1, 9];
  * @param {string} [responseUrl]
  */
 function nextHostMessage(sheet, responseUrl) {
-  if (host = nextHost(sheet)) {
+  let host = nextHost(sheet);
+  if (host) {
     let channelId = sheet.getName();
     postMessage(host.slackId, {channelId, responseUrl});
   }
@@ -53,7 +54,8 @@ function replaceTrigger(sheet) {
   deleteTrigger(scheduleData.triggerUid);
 
   let range = sheet.getRange(...TRIGGER_UID_RANGE);
-  if (nextMeeting = getNextMeeting(scheduleData)) {
+  let nextMeeting = getNextMeeting(scheduleData);
+  if (nextMeeting) {
     let trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
       .timeBased()
       .at(nextMeeting)
@@ -76,7 +78,8 @@ function replaceTrigger(sheet) {
  * @param {TimeDrivenTriggerEvent} e
  */
 function onTimeDrivenEvent(e) {
-  if (sheet = findSheet(e.triggerUid)) {
+  let sheet = findSheet(e.triggerUid);
+  if (sheet) {
     nextHostMessage(sheet);
     replaceTrigger(sheet);
   } else {

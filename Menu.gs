@@ -69,7 +69,8 @@ function newSheet(channelId) {
       ]
     );
 
-  if (members = getMembers(channelId)) {
+  let members = getMembers(channelId);
+  if (members) {
     let rowNum = 0;
     for (let userId of members) {
       let user = getUserInfo(userId);
