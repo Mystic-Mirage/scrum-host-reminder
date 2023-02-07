@@ -112,9 +112,7 @@ function reReadMembers() {
   let ui = SpreadsheetApp.getUi();
   let result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
 
-  if (result == ui.Button.NO) {
-    return;
-  }
+  if (result === ui.Button.NO) return;
 
   let sheet = SpreadsheetApp.getActive().getActiveSheet();
   let hosts = getHosts(sheet);
@@ -143,10 +141,36 @@ function reReadMembers() {
 }
 
 
+function deleteSheet() {
+  let ui = SpreadsheetApp.getUi();
+  let result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);
+  if (result === ui.Button.NO) return;
+
+  let channelId = ui.prompt("Confirm by entering channel ID", ).getResponseText();
+  if (!channelId) return;
+
+  let spreadsheet = SpreadsheetApp.getActive();
+  let sheet = spreadsheet.getActiveSheet();
+
+  if (sheet.getName() !== channelId) return;
+
+  let triggerRange = sheet.getRange(...TRIGGER_UID_RANGE);
+  deleteTrigger(triggerRange.getValue());
+  triggerRange.clearContent();
+
+  spreadsheet.deleteSheet(sheet);
+  disarmLastMessageUi(channelId);
+  leaveChannel(channelId);
+}
+
+
 function onOpen() {
   let ui = SpreadsheetApp.getUi();
   ui.createMenu("Scrum Host Reminder")
     .addItem("Add Slack channel", addChannel.name)
+    .addSeparator()
     .addItem("Re-read the channel members", reReadMembers.name)
+    .addSeparator()
+    .addItem("Delete current channel", deleteSheet.name)
     .addToUi();
 }

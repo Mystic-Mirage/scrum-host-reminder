@@ -51,7 +51,8 @@ function post(token, url, data) {
     }
   );
 
-  UrlFetchApp.fetch(url, params);
+  let result = UrlFetchApp.fetch(url, params);
+  console.log(result.getContentText());
 }
 
 
@@ -176,6 +177,16 @@ function disarmLastMessage(token, channelId, appId) {
 
     nextCursor = history.response_metadata.next_cursor;
   }
+}
+
+
+/**
+ * @param {string} channelId
+ */
+function disarmLastMessageUi(channelId) {
+  let props = getScriptProperties();
+
+  disarmLastMessage(props.SLACK_TOKEN, channelId, props.SLACK_APP_ID);
 }
 
 
@@ -347,6 +358,19 @@ function joinChannel(channelId) {
     channel: channelId,
   }
   postApi(token, "conversations.join", data);
+}
+
+
+/**
+ * @param {string} channelId
+ */
+function leaveChannel(channelId) {
+  let token = getScriptProperties().SLACK_TOKEN;
+
+  let data = {
+    channel: channelId,
+  }
+  postApi(token, "conversations.leave", data);
 }
 
 
