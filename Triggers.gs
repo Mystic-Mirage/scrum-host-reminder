@@ -20,11 +20,7 @@ function nextHostMessage(sheet, responseUrl) {
  */
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
-  for (let sheet of sheets) {
-    if (sheet.getRange(...TRIGGER_UID_RANGE).getValue() === triggerUid) {
-      return sheet;
-    }
-  }
+  return sheets.find(function (value) {return value.getRange(...TRIGGER_UID_RANGE).getValue() === triggerUid});
 }
 
 
@@ -33,12 +29,9 @@ function findSheet(triggerUid) {
  */
 function deleteTrigger(triggerUid) {
   let triggers = ScriptApp.getProjectTriggers();
-
-  for (let trigger of triggers) {
-    if (trigger.getUniqueId() === triggerUid) {
+  let trigger = triggers.find(function (value) {return value.getUniqueId() === triggerUid});
+  if (trigger) {
       ScriptApp.deleteTrigger(trigger);
-      break;
-    }
   }
 }
 
