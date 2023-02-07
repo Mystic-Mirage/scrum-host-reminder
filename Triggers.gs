@@ -107,17 +107,15 @@ function onEditEvent(e) {
 
 function doPost(e) {
   let payload = JSON.parse(e.parameter.payload);
-  let actionId = payload.actions[0].action_id;
-  let responseUrl = payload.response_url;
   let sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
 
-  switch (actionId) {
+  switch (payload.actions[0].action_id) {
     case "next-host":
-      nextHostMessage(sheet, responseUrl);
+      nextHostMessage(sheet, payload.response_url);
       break;
     case "skip-meeting":
       skipMeeting(sheet);
-      deleteOriginalMessage(responseUrl);
+      markMessageSkipped(payload.message, payload.response_url)
       break;
   }
 

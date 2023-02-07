@@ -124,7 +124,7 @@ function getUserInfo(userId) {
  * @param {string} token
  * @param {string} appId
  */
-function deleteLastMessage(channelId, token, appId) {
+function disarmLastMessage(channelId, token, appId) {
   let nextCursor;
 
   for (let repeat = 0; repeat < 10; repeat++) {
@@ -137,9 +137,10 @@ function deleteLastMessage(channelId, token, appId) {
         let data = {
           channel: channelId,
           ts: message.ts,
+          blocks: removeActions(message.blocks),
         }
 
-        postApi("chat.delete", token, data);
+        postApi("chat.update", token, data);
         return;
       }
     }
@@ -152,13 +153,66 @@ function deleteLastMessage(channelId, token, appId) {
 
 
 /**
+ * @param {Host} next
+ * @param {Host} afterNext
+ * @param {boolean} [markdown]
+ */
+function composeText(next, afterNext, markdown) {
+  let nextName = markdown ? `<@${next.slackId}>` : next.name;
+  let messageLines = [
+    "Hello!",
+    `This is a friendly reminder that ${nextName} is hosting today's stand-up meeting${markdown ? "" : "."}`,
+  ]
+
+  if (afterNext) {
+    let nextAfterName = markdown ? `*${afterNext.name}*` : afterNext.name;
+    let suffix = afterNext.name.endsWith("s") ? "" : "s";
+    let footer = `Next time it's ${nextAfterName}'${suffix} turn`;
+    if (markdown) {
+      messageLines.push(`_${footer}_`);
+    } else {
+      messageLines.push(footer);
+    }
+  }
+
+  return messageLines.join(markdown ? "\n\n": " ");
+}
+
+
+/**
+ * @param {Object[]} blocks
+ * @param {string} blocks[].type
+ * @returns {Object[]}
+ */
+function removeActions(blocks) {
+  return blocks.filter(function (value) {return value.type !== "actions"});
+}
+
+
+/**
+ * @param {Object} message
+ * @param {Object[]} message.blocks
  * @param {string} responseUrl
  */
-function deleteOriginalMessage(responseUrl) {
+function markMessageSkipped(message, responseUrl) {
   let props = getScriptProperties();
+
+  let blocks = removeActions(message.blocks);
+  blocks.push(
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: "*` Skipped `*",
+      },
+    },
+  );
+
   let data = {
-    delete_original: true,
+    blocks,
+    replace_original: true,
   };
+
   post(responseUrl, props.SLACK_TOKEN, data);
 }
 
@@ -174,15 +228,14 @@ function postMessage(next, afterNext, params) {
   let props = getScriptProperties();
 
   let data = {
+    text: composeText(next, afterNext),
     blocks: [
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: "Hello!\n\n" +
-                `This is a friendly reminder that <@${next.slackId}> is hosting today's stand-up meeting` +
-                (afterNext ? `\n\n_Next time it's *${afterNext.name}*'${afterNext.name.endsWith("s") ? "" : "s"} turn_` : "")
-        }
+          text: composeText(next, afterNext, true),
+        },
       },
       {
         type: "actions",
@@ -197,11 +250,11 @@ function postMessage(next, afterNext, params) {
             confirm: {
               title: {
                   type: "plain_text",
-                  text: "Skip the meeting?"
+                  text: "Skip the meeting",
               },
               text: {
                   type: "plain_text",
-                  text: "Re-select today's host for the next meeting",
+                  text: "Re-select today's host for the next meeting?",
               },
               confirm: {
                   type: "plain_text",
@@ -210,7 +263,7 @@ function postMessage(next, afterNext, params) {
               deny: {
                   type: "plain_text",
                   text: "No",
-              }
+              },
             },
             action_id: "skip-meeting",
           },
@@ -224,11 +277,11 @@ function postMessage(next, afterNext, params) {
             confirm: {
               title: {
                   type: "plain_text",
-                  text: "Next host?"
+                  text: "Next host"
               },
               text: {
                   type: "plain_text",
-                  text: "Select a new host for today's meeting",
+                  text: "Select a new host for today's meeting?",
               },
               confirm: {
                   type: "plain_text",
@@ -237,7 +290,7 @@ function postMessage(next, afterNext, params) {
               deny: {
                   type: "plain_text",
                   text: "No",
-              }
+              },
             },
             action_id: "next-host",
           }
@@ -250,7 +303,7 @@ function postMessage(next, afterNext, params) {
     data.replace_original = true;
     post(params.responseUrl, props.SLACK_TOKEN, data);
   } else if (params.channelId) {
-    deleteLastMessage(params.channelId, props.SLACK_TOKEN, props.SLACK_APP_ID);
+    disarmLastMessage(params.channelId, props.SLACK_TOKEN, props.SLACK_APP_ID);
     data.channel = params.channelId;
     postApi("chat.postMessage", props.SLACK_TOKEN, data);
   }
