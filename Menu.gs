@@ -110,13 +110,17 @@ function addChannel() {
 
 function reReadMembers() {
   let ui = SpreadsheetApp.getUi();
+  let sheet = SpreadsheetApp.getActive().getActiveSheet();
+  let sheetName = sheet.getName();
+
+  if (sheetName === TIMEZONES_SHEET_NAME) return ui.alert(`You cannot do this with "${TIMEZONES_SHEET_NAME}"!`);
+
   let result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
 
   if (result === ui.Button.NO) return;
 
-  let sheet = SpreadsheetApp.getActive().getActiveSheet();
   let hosts = getHosts(sheet);
-  let members = getMembers(sheet.getName());
+  let members = getMembers(sheetName);
 
   sheet.getRange(1, 1, sheet.getMaxRows(), 4).clear().removeCheckboxes();
 
@@ -143,16 +147,20 @@ function reReadMembers() {
 
 function deleteSheet() {
   let ui = SpreadsheetApp.getUi();
+
+  let spreadsheet = SpreadsheetApp.getActive();
+  let sheet = spreadsheet.getActiveSheet();
+  let sheetName = sheet.getName();
+
+  if (sheetName === TIMEZONES_SHEET_NAME) return ui.alert(`You cannot delete "${TIMEZONES_SHEET_NAME}"!`);
+
   let result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);
   if (result === ui.Button.NO) return;
 
   let channelId = ui.prompt("Confirm by entering channel ID", ).getResponseText();
   if (!channelId) return;
 
-  let spreadsheet = SpreadsheetApp.getActive();
-  let sheet = spreadsheet.getActiveSheet();
-
-  if (sheet.getName() !== channelId) return;
+  if (sheetName !== channelId) return;
 
   let triggerRange = sheet.getRange(...TRIGGER_UID_RANGE);
   deleteTrigger(triggerRange.getValue());
