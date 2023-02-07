@@ -75,23 +75,18 @@ function newSheet(channelId) {
 
   let members = getMembers(channelId);
   if (members) {
-    let rowNum = 0;
+    let rowIndex = 0;
     for (let userId of members) {
       let user = getUserInfo(userId);
       if (!user.is_bot) {
-        rowNum++;
-        sheet.getRange(rowNum, 1, 1, 2).setValues([[user.real_name, userId]]);
-        sheet.getRange(rowNum, 3).insertCheckboxes();
+        rowIndex++;
+        sheet.getRange(rowIndex, 3).insertCheckboxes();
+        sheet.getRange(rowIndex, 1, 1, 4).setValues([[user.real_name, userId, false, new Date()]]);
       }
     }
   }
 
-  let hosts = getHosts(sheet, "name");
-  let hostsValues = [];
-  for (let host of hosts) {
-    hostsValues.push([host.name, host.slackId]);
-  }
-  sheet.getRange(1, 1, hostsValues.length, 2).setValues(hostsValues);
+  sheet.getRange(1, 1, sheet.getMaxRows(), 4).sort(1);
 }
 
 
@@ -112,9 +107,45 @@ function addChannel() {
 }
 
 
+function reReadMembers() {
+  let ui = SpreadsheetApp.getUi();
+  let result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
+
+  if (result == ui.Button.NO) {
+    return;
+  }
+
+  let sheet = SpreadsheetApp.getActive().getActiveSheet();
+  let hosts = getHosts(sheet);
+  let members = getMembers(sheet.getName());
+
+  sheet.getRange(1, 1, sheet.getMaxRows(), 4).clear().removeCheckboxes();
+
+  let rowIndex = 0;
+  for (let userId of members) {
+    let host = hosts.find(function (value) {return value.slackId === userId});
+    if (host) {
+      rowIndex++;
+      sheet.getRange(rowIndex, 3).insertCheckboxes();
+      sheet.getRange(rowIndex, 1, 1, 4).setValues([[host.name, host.slackId, host.active, host.timestamp]]);
+    } else {
+      let user = getUserInfo(userId);
+      if (!user.is_bot) {
+        rowIndex++;
+        sheet.getRange(rowIndex, 3).insertCheckboxes();
+        sheet.getRange(rowIndex, 1, 1, 4).setValues([[user.real_name, userId, false, new Date()]]);
+      }
+    }
+  }
+
+  sheet.getRange(1, 1, sheet.getMaxRows(), 4).sort(1);
+}
+
+
 function onOpen() {
   let ui = SpreadsheetApp.getUi();
   ui.createMenu("Scrum Host Reminder")
     .addItem("Add Slack channel", addChannel.name)
+    .addItem("Re-read the channel members", reReadMembers.name)
     .addToUi();
 }
