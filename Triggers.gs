@@ -1,4 +1,5 @@
 const TRIGGER_UID_RANGE = [1, 9];
+const TIMEZONES_SHEET_NAME = "timezones";
 
 
 /**
@@ -20,7 +21,9 @@ function nextHostMessage(sheet, responseUrl) {
  */
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
-  return sheets.find(function (value) {return value.getRange(...TRIGGER_UID_RANGE).getValue() === triggerUid});
+  return sheets.find(function (value) {
+    return value.getName() !== TIMEZONES_SHEET_NAME && value.getRange(...TRIGGER_UID_RANGE).getValue() === triggerUid
+  });
 }
 
 

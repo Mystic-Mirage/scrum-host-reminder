@@ -38,7 +38,7 @@ function newSheet(channelId) {
     .build();
   dateTimeRange.setDataValidation(dateTimeValidation);
 
-  let tzRangeSource = spreadsheet.getRange("timezones!A:A");
+  let tzRangeSource = spreadsheet.getRange(`${TIMEZONES_SHEET_NAME}!A:A`);
   let tzValidation = SpreadsheetApp.newDataValidation()
     .requireValueInRange(tzRangeSource, false)
     .setAllowInvalid(false)
