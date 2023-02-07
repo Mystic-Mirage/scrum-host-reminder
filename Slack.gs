@@ -372,8 +372,8 @@ function debugGetMembers() {
 }
 
 
-function debugGetUserName() {
+function debugGetUserInfo() {
   let sheet = SpreadsheetApp.getActive().getSheets()[1];
   let userId = sheet.getRange(1, 2).getValue();
-  console.log(getUserName(userId));
+  console.log(getUserInfo(userId));
 }
