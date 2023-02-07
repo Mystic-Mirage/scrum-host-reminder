@@ -50,7 +50,7 @@ function nextHosts(sheet) {
       if (next) {
         afterNext = host;
         break;
-      } {
+      } else {
         next = host;
       }
     }
