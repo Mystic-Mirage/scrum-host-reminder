@@ -28,21 +28,15 @@ function newSheet(channelId) {
   sheet.getRange(1, 5, sheet.getMaxRows()).setBackground("#efefef");
 
   let startOfWeek = getStartOfWeek();
-  sheet.getRange(1, 6).setValue(startOfWeek).setNumberFormat("yyyy-mm-dd");
+  sheet.getRange(1, 6).setNumberFormat("yyyy-mm-dd").setValue(startOfWeek);
+  sheet.getRange(1, 7).setNumberFormat("hh:mm");
 
-  let timeRange = sheet.getRange(1, 7);
-  timeRange.setNumberFormat("hh:mm");
-  let timeValidation = SpreadsheetApp.newDataValidation()
+  let dateTimeRange = sheet.getRange(1, 6, 1, 2);
+  let dateTimeValidation = SpreadsheetApp.newDataValidation()
     .requireDate()
     .setAllowInvalid(false)
     .build();
-  timeRange.setDataValidation(timeValidation);
-  let timeFormatting = SpreadsheetApp.newConditionalFormatRule()
-    .whenCellEmpty()
-    .setBackground("#f4cccc")
-    .setRanges([timeRange])
-    .build();
-  sheet.setConditionalFormatRules([timeFormatting]);
+  dateTimeRange.setDataValidation(dateTimeValidation);
 
   let tzRangeSource = spreadsheet.getRange("timezones!A:A");
   let tzValidation = SpreadsheetApp.newDataValidation()
@@ -50,6 +44,13 @@ function newSheet(channelId) {
     .setAllowInvalid(false)
     .build();
   sheet.getRange(1, 8).setDataValidation(tzValidation).setValue("UTC");
+
+  let scheduleDataFormatting = SpreadsheetApp.newConditionalFormatRule()
+    .whenCellEmpty()
+    .setBackground("#f4cccc")
+    .setRanges([sheet.getRange(1, 6, 1, 3)])
+    .build();
+  sheet.setConditionalFormatRules([scheduleDataFormatting]);
 
   sheet.getRange(1, 6, 1, 4).setNotes(
     [
@@ -69,7 +70,7 @@ function newSheet(channelId) {
     .setValues(
       [
         [true, true, true, true, true, false, false],
-        [true, true, true, true, true, false, false]
+        [true, true, true, true, true, false, false],
       ]
     );
 
