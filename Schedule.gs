@@ -60,7 +60,7 @@ function tzDate(timeZone, year, monthIndex, day, hour, minute) {
  * @returns {Date}
  */
 function getNextMeeting(scheduleData) {
-  if (!scheduleData.timeAt) return;
+  if (!(scheduleData.startPoint && scheduleData.timeAt && scheduleData.timeZone)) return;
 
   let now = new Date();
   let startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
