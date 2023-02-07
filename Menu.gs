@@ -54,10 +54,10 @@ function newSheet(channelId) {
   sheet.getRange(1, 6, 1, 4).setNotes(
     [
       [
-        "Start point",
+        "Start point\n\nThe starting date of the schedule",
         "Meeting time",
-        "Timezone",
-        "Stored trigger UID. DO NOT REMOVE!"
+        "Meeting timezone",
+        "!!! DO NOT REMOVE !!!\n\nStored trigger UID"
       ]
     ]
   );
