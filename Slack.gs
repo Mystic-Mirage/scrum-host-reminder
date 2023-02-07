@@ -11,7 +11,7 @@ function getScriptProperties() {
  * @returns {string}
  */
 function apiUrl(path) {
-  return "https://slack.com/api/" + path;
+  return `https://slack.com/api/${path}`;
 }
 
 
@@ -23,7 +23,9 @@ function apiUrl(path) {
 function prepareFetchParams(token, data) {
   let params = {
     contentType: "application/json; charset=utf-8",
-    headers: {Authorization: "Bearer " + token},
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   };
   return {...params, ...data};
 }
@@ -59,13 +61,26 @@ function postApi(path, token, data) {
 
 
 /**
+ * @param {Object} data
+ * @returns {string}
+ */
+function getParams(data) {
+  let params = Object.entries(data).map(function ([k, v]) {return `${k}=${v}`});
+  if (params) {
+    return `?${params.join("&")}`;
+  }
+  return "";
+}
+
+
+/**
  * @param {string} path
- * @param {string} argString
+ * @param {Object} data
  * @param {string} token
  * @returns {Object[]}
  */
-function getApi(path, argString, token) {
-  let url = apiUrl(path) + argString;
+function getApi(path, token, data) {
+  let url = apiUrl(path) + getParams(data);
   let params = prepareFetchParams(token);
 
   let response = UrlFetchApp.fetch(url, params);
@@ -80,12 +95,14 @@ function getApi(path, argString, token) {
  * @returns {Object[]}
  */
 function readHistory(channelId, token, nextCursor) {
-  let argString = "?channel=" + channelId;
+  let data = {
+    channel: channelId,
+  };
   if (nextCursor) {
-    argString += "&cursor=" + nextCursor;
+    data.cursor = nextCursor;
   }
 
-  return getApi("conversations.history", argString, token);
+  return getApi("conversations.history", token, data);
 }
 
 
@@ -96,8 +113,10 @@ function readHistory(channelId, token, nextCursor) {
 function getMembers(channelId) {
   let props = getScriptProperties();
 
-  let argString = "?channel=" + channelId;
-  return getApi("conversations.members", argString, props.SLACK_TOKEN).members;
+  let data = {
+    channel: channelId,
+  };
+  return getApi("conversations.members", props.SLACK_TOKEN, data).members;
 }
 
 
@@ -115,7 +134,10 @@ function getMembers(channelId) {
 function getUserInfo(userId) {
   let props = getScriptProperties();
 
-  return getApi("users.info", "?user=" + userId, props.SLACK_TOKEN).user;
+  let data = {
+    user: userId,
+  }
+  return getApi("users.info", props.SLACK_TOKEN, data).user;
 }
 
 
@@ -331,7 +353,11 @@ function joinChannel(channelId) {
 function checkChannel(channelId) {
   let props = getScriptProperties();
 
-  let result = getApi("conversations.info", "?channel=" + channelId, props.SLACK_TOKEN);
+  let data = {
+    channel: channelId,
+  };
+  let result = getApi("conversations.info", props.SLACK_TOKEN, data);
+  console.log(result);
   return result.ok;
 }
 
