@@ -205,7 +205,7 @@ function composeText(next, afterNext, markdown) {
   if (afterNext) {
     let nextAfterName = markdown ? `*${afterNext.name}*` : afterNext.name;
     let suffix = afterNext.name.endsWith("s") ? "" : "s";
-    let footer = `Next time it's ${nextAfterName}'${suffix} turn`;
+    let footer = `Next time it's ${nextAfterName}'${suffix} turn${next.slackId === afterNext.slackId ? " again" : ""}`;
     if (markdown) {
       messageLines.push(`_${footer}_`);
     } else {
