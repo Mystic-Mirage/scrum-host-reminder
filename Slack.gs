@@ -1,5 +1,11 @@
 /**
- * @returns {Object}
+ * @typedef {Object} ScriptProperties
+ * @property {string} SLACK_APP_ID
+ * @property {string} SLACK_TOKEN
+ */
+
+/**
+ * @returns {ScriptProperties}
  */
 function getScriptProperties() {
   return PropertiesService.getScriptProperties().getProperties();
@@ -32,11 +38,11 @@ function prepareFetchParams(token, data) {
 
 
 /**
- * @param {string} url
  * @param {string} token
+ * @param {string} url
  * @param {Object} data
  */
-function post(url, token, data) {
+function post(token, url, data) {
   let params = prepareFetchParams(
     token,
     {
@@ -50,13 +56,13 @@ function post(url, token, data) {
 
 
 /**
- * @param {string} path
  * @param {string} token
+ * @param {string} path
  * @param {Object} data
  */
-function postApi(path, token, data) {
+function postApi(token, path, data) {
   let url = apiUrl(path);
-  post(url, token, data);
+  post(token, url, data);
 }
 
 
@@ -74,12 +80,12 @@ function getParams(data) {
 
 
 /**
+ * @param {string} token
  * @param {string} path
  * @param {Object} data
- * @param {string} token
  * @returns {Object[]}
  */
-function getApi(path, token, data) {
+function getApi(token, path, data) {
   let url = apiUrl(path) + getParams(data);
   let params = prepareFetchParams(token);
 
@@ -89,12 +95,12 @@ function getApi(path, token, data) {
 
 
 /**
- * @param {string} channelId
  * @param {string} token
+ * @param {string} channelId
  * @param {string} [nextCursor]
- * @returns {Object[]}
+ * @returns {Object}
  */
-function readHistory(channelId, token, nextCursor) {
+function readHistory(token, channelId, nextCursor) {
   let data = {
     channel: channelId,
   };
@@ -102,7 +108,7 @@ function readHistory(channelId, token, nextCursor) {
     data.cursor = nextCursor;
   }
 
-  return getApi("conversations.history", token, data);
+  return getApi(token, "conversations.history", data);
 }
 
 
@@ -111,12 +117,12 @@ function readHistory(channelId, token, nextCursor) {
  * @returns {Object[]}
  */
 function getMembers(channelId) {
-  let props = getScriptProperties();
+  let token = getScriptProperties().SLACK_TOKEN;
 
   let data = {
     channel: channelId,
   };
-  return getApi("conversations.members", props.SLACK_TOKEN, data).members;
+  return getApi(token, "conversations.members", data).members;
 }
 
 
@@ -132,25 +138,24 @@ function getMembers(channelId) {
  * @returns {User}
  */
 function getUserInfo(userId) {
-  let props = getScriptProperties();
+  let token = getScriptProperties().SLACK_TOKEN;
 
   let data = {
     user: userId,
   }
-  return getApi("users.info", props.SLACK_TOKEN, data).user;
+  return getApi(token,"users.info", data).user;
 }
 
 
 /**
- * @param {string} channelId
  * @param {string} token
+ * @param {string} channelId
  * @param {string} appId
  */
-function disarmLastMessage(channelId, token, appId) {
-  let nextCursor;
-
+function disarmLastMessage(token, channelId, appId) {
+  let nextCursor = "";
   for (let repeat = 0; repeat < 10; repeat++) {
-    let history = readHistory(channelId, token, nextCursor);
+    let history = readHistory(token, channelId, nextCursor);
 
     if (!history.messages) return;
 
@@ -162,7 +167,7 @@ function disarmLastMessage(channelId, token, appId) {
           blocks: removeActions(message.blocks),
         }
 
-        postApi("chat.update", token, data);
+        postApi(token, "chat.update", data);
         return;
       }
     }
@@ -217,7 +222,7 @@ function removeActions(blocks) {
  * @param {string} responseUrl
  */
 function markMessageSkipped(message, responseUrl) {
-  let props = getScriptProperties();
+  let token = getScriptProperties().SLACK_TOKEN;
 
   let blocks = removeActions(message.blocks);
   blocks.push(
@@ -235,7 +240,7 @@ function markMessageSkipped(message, responseUrl) {
     replace_original: true,
   };
 
-  post(responseUrl, props.SLACK_TOKEN, data);
+  post(token, responseUrl, data);
 }
 
 
@@ -323,11 +328,11 @@ function postMessage(next, afterNext, params) {
 
   if (params.responseUrl) {
     data.replace_original = true;
-    post(params.responseUrl, props.SLACK_TOKEN, data);
+    post(props.SLACK_TOKEN, params.responseUrl, data);
   } else if (params.channelId) {
-    disarmLastMessage(params.channelId, props.SLACK_TOKEN, props.SLACK_APP_ID);
+    disarmLastMessage(props.SLACK_TOKEN, params.channelId, props.SLACK_APP_ID);
     data.channel = params.channelId;
-    postApi("chat.postMessage", props.SLACK_TOKEN, data);
+    postApi(props.SLACK_TOKEN, "chat.postMessage", data);
   }
 }
 
@@ -336,13 +341,12 @@ function postMessage(next, afterNext, params) {
  * @param {string} channelId
  */
 function joinChannel(channelId) {
-  let props = getScriptProperties();
+  let token = getScriptProperties().SLACK_TOKEN;
 
   let data = {
     channel: channelId,
   }
-
-  postApi("conversations.join", props.SLACK_TOKEN, data);
+  postApi(token, "conversations.join", data);
 }
 
 
@@ -351,12 +355,12 @@ function joinChannel(channelId) {
  * @returns {boolean}
  */
 function checkChannel(channelId) {
-  let props = getScriptProperties();
+  let token = getScriptProperties().SLACK_TOKEN;
 
   let data = {
     channel: channelId,
   };
-  let result = getApi("conversations.info", props.SLACK_TOKEN, data);
+  let result = getApi(token, "conversations.info", data);
   console.log(result);
   return result.ok;
 }
