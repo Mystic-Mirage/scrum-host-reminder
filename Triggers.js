@@ -21,9 +21,8 @@ function nextHostMessage(sheet, responseUrl) {
  */
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
-  return sheets.find(function (value) {
-    return value.getName() !== TIMEZONES_SHEET_NAME && value.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN).getValue().toString() === triggerUid
-  });
+  return sheets.find((sheet) => sheet.getName() !== TIMEZONES_SHEET_NAME &&
+    sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN).getValue().toString() === triggerUid);
 }
 
 
@@ -32,7 +31,7 @@ function findSheet(triggerUid) {
  */
 function deleteTrigger(triggerUid) {
   let triggers = ScriptApp.getProjectTriggers();
-  let trigger = triggers.find(function (value) {return value.getUniqueId() === triggerUid});
+  let trigger = triggers.find((trigger) => trigger.getUniqueId() === triggerUid);
   if (trigger) {
       ScriptApp.deleteTrigger(trigger);
   }

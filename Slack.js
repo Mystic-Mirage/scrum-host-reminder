@@ -72,7 +72,7 @@ function postApi(token, path, data) {
  * @returns {string}
  */
 function getParams(data) {
-  let params = Object.entries(data).map(function ([k, v]) {return `${k}=${v}`});
+  let params = Object.entries(data).map(([k, v]) => `${k}=${v}`);
   if (params) {
     return `?${params.join("&")}`;
   }
@@ -223,7 +223,7 @@ function composeText(next, afterNext, markdown) {
  * @returns {Object[]}
  */
 function removeActions(blocks) {
-  return blocks.filter(function (value) {return value.type !== "actions"});
+  return blocks.filter((block) => block.type !== "actions");
 }
 
 

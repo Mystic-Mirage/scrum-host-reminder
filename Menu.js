@@ -126,7 +126,7 @@ function reReadMembers() {
 
   let rowIndex = 0;
   for (let userId of members) {
-    let host = hosts.find(function (value) {return value.slackId === userId});
+    let host = hosts.find((host) => host.slackId === userId);
     if (host) {
       rowIndex++;
       sheet.getRange(rowIndex, 3).insertCheckboxes();

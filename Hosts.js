@@ -37,7 +37,7 @@ function nextHosts(sheet) {
   let next, afterNext;
 
   let hosts = getHosts(sheet);
-  let last = hosts.reduce(function (a, b) {return a.timestamp > b.timestamp ? a : b});
+  let last = hosts.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
   let nextIndex = hosts.indexOf(last) + 1;
   let hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
 
