@@ -38,7 +38,8 @@ function nextHosts(sheet) {
 
   let hosts = getHosts(sheet);
   let last = hosts.reduce(function (a, b) {return a.timestamp > b.timestamp ? a : b});
-  let hostsCarrousel = [...hosts.slice(last.idx), ...hosts.slice(0, last.idx)];
+  let nextIndex = hosts.indexOf(last) + 1;
+  let hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
 
   for (let host of hostsCarrousel) {
     if (!next) sheet.getRange(host.idx, 4).setValue(new Date());
