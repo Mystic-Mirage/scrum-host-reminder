@@ -1,5 +1,5 @@
-const TRIGGER_UID_RANGE = [1, 9];
 const TIMEZONES_SHEET_NAME = "timezones";
+const [TRIGGER_UID_ROW, TRIGGER_UID_COLUMN] = [1, 9];
 
 
 /**
@@ -22,7 +22,7 @@ function nextHostMessage(sheet, responseUrl) {
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
   return sheets.find(function (value) {
-    return value.getName() !== TIMEZONES_SHEET_NAME && value.getRange(...TRIGGER_UID_RANGE).getValue() === triggerUid
+    return value.getName() !== TIMEZONES_SHEET_NAME && value.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN).getValue().toString() === triggerUid
   });
 }
 
@@ -49,7 +49,7 @@ function replaceTrigger(sheet) {
 
   deleteTrigger(scheduleData.triggerUid);
 
-  let range = sheet.getRange(...TRIGGER_UID_RANGE);
+  let triggerRange = sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN);
   let nextMeeting = getNextMeeting(scheduleData);
   if (nextMeeting) {
     let trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
@@ -57,9 +57,9 @@ function replaceTrigger(sheet) {
       .at(nextMeeting)
       .create();
 
-    range.setValue(trigger.getUniqueId());
+    triggerRange.setValue(trigger.getUniqueId());
   } else {
-    range.clearContent();
+    triggerRange.clearContent();
   }
 }
 

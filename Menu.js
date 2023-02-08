@@ -63,7 +63,7 @@ function newSheet(channelId) {
     ]
   );
 
-  sheet.getRange(...TRIGGER_UID_RANGE).protect().setWarningOnly(true);
+  sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN).protect().setWarningOnly(true);
 
   sheet.getRange(2, 6, 2, 7)
     .insertCheckboxes()
@@ -162,8 +162,8 @@ function deleteSheet() {
 
   if (sheetName !== channelId) return;
 
-  let triggerRange = sheet.getRange(...TRIGGER_UID_RANGE);
-  deleteTrigger(triggerRange.getValue());
+  let triggerRange = sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN);
+  deleteTrigger(triggerRange.getValue().toString());
   triggerRange.clearContent();
 
   spreadsheet.deleteSheet(sheet);
