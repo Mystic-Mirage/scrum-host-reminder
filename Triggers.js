@@ -10,7 +10,7 @@ function nextHostMessage(sheet, responseUrl) {
   let [next, afterNext] = nextHosts(sheet);
   if (next) {
     let channelId = sheet.getName();
-    postMessage(next, afterNext, {channelId, responseUrl});
+    sendMessage(next, afterNext, {channelId, responseUrl});
   }
 }
 
@@ -65,13 +65,7 @@ function replaceTrigger(sheet) {
 
 
 /**
- * @typedef {Object} TimeDrivenTriggerEvent
- * @property {number} triggerUid
- */
-
-
-/**
- * @param {TimeDrivenTriggerEvent} e
+ * @param {GoogleAppsScript.Events.TimeDriven} e
  */
 function onTimeDrivenEvent(e) {
   let sheet = findSheet(e.triggerUid);
@@ -85,13 +79,7 @@ function onTimeDrivenEvent(e) {
 
 
 /**
- * @typedef {Object} SpreadsheetOnEditEvent
- * @property {SpreadsheetApp.Range} range
- */
-
-
-/**
- * @param {SpreadsheetOnEditEvent} e
+ * @param {GoogleAppsScript.Events.SheetsOnEdit} e
  */
 function onEditEvent(e) {
   if (e.range.getColumn() > 5) {
@@ -101,6 +89,11 @@ function onEditEvent(e) {
 }
 
 
+
+/**
+ * @param {GoogleAppsScript.Events.DoPost} e
+ * @returns {GoogleAppsScript.Content.TextOutput}
+ */
 function doPost(e) {
   let payload = JSON.parse(e.parameter.payload);
   let sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);

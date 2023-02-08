@@ -262,7 +262,7 @@ function markMessageSkipped(message, responseUrl) {
  * @param {string} [params.channelId]
  * @param {string} [params.responseUrl]
  */
-function postMessage(next, afterNext, params) {
+function sendMessage(next, afterNext, params) {
   let props = getScriptProperties();
 
   let data = {
