@@ -6,7 +6,7 @@ const DAY_MS = 86400000;
  * @property {Date} startPoint
  * @property {Date} timeAt
  * @property {string} timeZone
- * @property {number} triggerUid
+ * @property {string} triggerUid
  * @property {boolean[]} schedule
  */
 

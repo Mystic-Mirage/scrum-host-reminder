@@ -16,7 +16,7 @@ function nextHostMessage(sheet, responseUrl) {
 
 
 /**
- * @param {number} triggerUid
+ * @param {string} triggerUid
  * @returns {SpreadsheetApp.Sheet}
  */
 function findSheet(triggerUid) {
@@ -28,7 +28,7 @@ function findSheet(triggerUid) {
 
 
 /**
- * @param {number} triggerUid
+ * @param {string} triggerUid
  */
 function deleteTrigger(triggerUid) {
   let triggers = ScriptApp.getProjectTriggers();
