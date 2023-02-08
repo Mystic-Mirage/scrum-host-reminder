@@ -25,12 +25,6 @@ function getHosts(sheet) {
     }
   }
 
-  hosts.sort(function (a, b) {
-    if (a.timestamp < b.timestamp) return -1;
-    if (a.timestamp > b.timestamp) return 1;
-    return 0;
-  });
-
   return hosts;
 }
 
@@ -40,12 +34,15 @@ function getHosts(sheet) {
  * @returns {Host[]}
  */
 function nextHosts(sheet) {
-  let now = new Date();
-
   let next, afterNext;
 
   let hosts = getHosts(sheet);
-  for (let host of hosts) {
+  let last = hosts.reduce(function (a, b) {return a.timestamp > b.timestamp ? a : b});
+  let hostsCarrousel = [...hosts.slice(last.idx), ...hosts.slice(0, last.idx)];
+
+  for (let host of hostsCarrousel) {
+    if (!next) sheet.getRange(host.idx, 4).setValue(new Date());
+
     if (host.active) {
       if (next) {
         afterNext = host;
@@ -54,7 +51,6 @@ function nextHosts(sheet) {
         next = host;
       }
     }
-    sheet.getRange(host.idx, 4).setValue(now);
   }
 
   return [next, afterNext];
