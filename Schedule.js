@@ -65,10 +65,10 @@ function getNextMeeting(scheduleData) {
   let now = new Date();
   let startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
 
-  let schedule = [...scheduleData.schedule, ...scheduleData.schedule];
+  let schedule = [...scheduleData.schedule.slice(startDay), ...scheduleData.schedule.slice(0, startDay)];
   let dayShift = 0;
-  for (let i = startDay; i < schedule.length; i++) {
-    if (schedule[i]) {
+  for (let day of schedule) {
+    if (day) {
       let date = new Date(now.getTime() + dayShift);
       let dateAt = tzDate(scheduleData.timeZone, date.getFullYear(), date.getMonth(), date.getDate(), scheduleData.timeAt.getHours(), scheduleData.timeAt.getMinutes());
 
