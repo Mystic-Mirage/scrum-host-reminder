@@ -32,6 +32,17 @@ function getHosts(sheet) {
 
 
 /**
+ * Find recent host
+ *
+ * @param {Host[]} hosts
+ * @returns {Host}
+ */
+function getLastHost(hosts) {
+  return hosts.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
+}
+
+
+/**
  * Get next and next after hosts from a queue
  * Use date as mark to calculate the next one
  *
@@ -42,7 +53,7 @@ function nextHosts(sheet) {
   let next, nextAfter;
 
   let hosts = getHosts(sheet);
-  let last = hosts.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
+  let last = getLastHost(hosts);
   let nextIndex = hosts.indexOf(last) + 1;
   let hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
 
@@ -64,13 +75,12 @@ function nextHosts(sheet) {
 
 
 /**
- * Remove date from current host so it will be re-elected as next host again
+ * Remove date from last host so it will be re-elected as next host again
  *
  * @param {SpreadsheetApp.Sheet} sheet
  */
 function skipMeeting(sheet) {
   let hosts = getHosts(sheet);
-
-  let host = hosts[hosts.length - 1];
-  sheet.getRange(host.idx, 4).clearContent();
+  let last = getLastHost(hosts);
+  sheet.getRange(last.idx, 4).clearContent();
 }
