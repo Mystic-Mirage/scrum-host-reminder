@@ -105,7 +105,9 @@ function getApi(token, path, data) {
   let params = prepareFetchParams(token);
 
   let response = UrlFetchApp.fetch(url, params);
-  return JSON.parse(response.getContentText());
+  let content = response.getContentText();
+  console.log(content);
+  return JSON.parse(content);
 }
 
 
@@ -426,7 +428,6 @@ function checkChannel(channelId) {
     channel: channelId,
   };
   let result = getApi(token, "conversations.info", data);
-  console.log(result);
   return result.ok;
 }
 

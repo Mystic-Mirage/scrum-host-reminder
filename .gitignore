@@ -1,3 +1,5 @@
 /.idea/
 /node_modules/
 /.clasp.json
+/.clasprc.json
+/client_secret_*.json
