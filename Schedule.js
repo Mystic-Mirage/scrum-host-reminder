@@ -34,24 +34,20 @@ function getScheduleData(sheet) {
 
 
 /**
+ * @param {Date} date
  * @param {string} timeZone
- * @param {number} year
- * @param {number} monthIndex
- * @param {number} day
- * @param {number} hour
- * @param {number} minute
  * @returns {Date}
  */
-function tzDate(timeZone, year, monthIndex, day, hour, minute) {
-  let date = new Date(Date.UTC(year, monthIndex, day, hour, minute));
+function tzDate(date, timeZone) {
+  let newDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds()));
 
-  let utcDate = new Date(date.toLocaleString("en-US", {timeZone: "UTC"}));
-  let tzDate = new Date(date.toLocaleString("en-US", {timeZone: timeZone}));
+  let utcDate = new Date(newDate.toLocaleString("en-US", {timeZone: "UTC"}));
+  let tzDate = new Date(newDate.toLocaleString("en-US", {timeZone: timeZone}));
   let offset = utcDate.getTime() - tzDate.getTime();
 
-  date.setTime(date.getTime() + offset);
+  newDate.setTime(newDate.getTime() + offset);
 
-  return date;
+  return newDate;
 }
 
 
@@ -70,7 +66,8 @@ function getNextMeeting(scheduleData) {
   for (let day of schedule) {
     if (day) {
       let date = new Date(now.getTime() + dayShift);
-      let dateAt = tzDate(scheduleData.timeZone, date.getFullYear(), date.getMonth(), date.getDate(), scheduleData.timeAt.getHours(), scheduleData.timeAt.getMinutes());
+      date.setHours(scheduleData.timeAt.getHours(), scheduleData.timeAt.getMinutes(), 0, 0);
+      let dateAt = tzDate(date, scheduleData.timeZone);
 
       if (dateAt > now) {
         return dateAt;
