@@ -1,3 +1,8 @@
+/**
+ * Get Monday date of the current week
+ *
+ * @returns {Date}
+ */
 function getStartOfWeek() {
   let date = new Date();
   let day = date.getDay();
@@ -10,6 +15,8 @@ function getStartOfWeek() {
 
 
 /**
+ * Create, fill and format a new sheet
+ *
  * @param {string} channelId
  */
 function newSheet(channelId) {
@@ -90,7 +97,9 @@ function newSheet(channelId) {
   sheet.getRange(1, 1, sheet.getMaxRows(), 4).sort(1);
 }
 
-
+/**
+ * Add new channel menu item handler
+ */
 function addChannel() {
   let ui = SpreadsheetApp.getUi();
   let result = ui.prompt("Enter Slack channel ID");
@@ -108,12 +117,18 @@ function addChannel() {
 }
 
 
+/**
+ * Re-read member list menu item handler
+ */
 function reReadMembers() {
   let ui = SpreadsheetApp.getUi();
   let sheet = SpreadsheetApp.getActive().getActiveSheet();
   let sheetName = sheet.getName();
 
-  if (sheetName === TIMEZONES_SHEET_NAME) return ui.alert(`You cannot do this with "${TIMEZONES_SHEET_NAME}"!`);
+  if (sheetName === TIMEZONES_SHEET_NAME) {
+    ui.alert(`You cannot do this with "${TIMEZONES_SHEET_NAME}"!`);
+    return;
+  }
 
   let result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
 
@@ -145,6 +160,9 @@ function reReadMembers() {
 }
 
 
+/**
+ * Delete sheet menu item handler
+ */
 function deleteSheet() {
   let ui = SpreadsheetApp.getUi();
 
@@ -152,7 +170,10 @@ function deleteSheet() {
   let sheet = spreadsheet.getActiveSheet();
   let sheetName = sheet.getName();
 
-  if (sheetName === TIMEZONES_SHEET_NAME) return ui.alert(`You cannot delete "${TIMEZONES_SHEET_NAME}"!`);
+  if (sheetName === TIMEZONES_SHEET_NAME) {
+    ui.alert(`You cannot delete "${TIMEZONES_SHEET_NAME}"!`);
+    return;
+  }
 
   let result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);
   if (result === ui.Button.NO) return;
@@ -172,6 +193,9 @@ function deleteSheet() {
 }
 
 
+/**
+ * Create a menu on spreadsheet open
+ */
 function onOpen() {
   let ui = SpreadsheetApp.getUi();
   ui.createMenu("Scrum Host Reminder")
