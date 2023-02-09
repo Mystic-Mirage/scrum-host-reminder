@@ -5,14 +5,18 @@
  */
 
 /**
+ * Return script properties with SLACK_APP_ID and SLACK_TOKEN
+ *
  * @returns {ScriptProperties}
  */
 function getScriptProperties() {
-  return PropertiesService.getScriptProperties().getProperties();
+  return /** @type {ScriptProperties} */ PropertiesService.getScriptProperties().getProperties();
 }
 
 
 /**
+ * Generate API URL with specified path
+ *
  * @param {string} path
  * @returns {string}
  */
@@ -22,9 +26,11 @@ function apiUrl(path) {
 
 
 /**
+ * Fill content type and authorization header for UrlFetchApp.fetch
+ *
  * @param {string} token
- * @param {Object} [data]
- * @returns {Object}
+ * @param {{[key: string]: string}} [data]
+ * @returns {URL_Fetch.URLFetchRequestOptions}
  */
 function prepareFetchParams(token, data) {
   let params = {
@@ -38,9 +44,11 @@ function prepareFetchParams(token, data) {
 
 
 /**
+ * Perform POST-request
+ *
  * @param {string} token
  * @param {string} url
- * @param {Object} data
+ * @param {{[key: string]: any}} data
  */
 function post(token, url, data) {
   let params = prepareFetchParams(
@@ -57,9 +65,11 @@ function post(token, url, data) {
 
 
 /**
+ * Slack API helper for POST-requests
+ *
  * @param {string} token
  * @param {string} path
- * @param {Object} data
+ * @param {{[key: string]: any}} data
  */
 function postApi(token, path, data) {
   let url = apiUrl(path);
@@ -68,7 +78,9 @@ function postApi(token, path, data) {
 
 
 /**
- * @param {Object} data
+ * Generate GET-request parameters string using data specified
+ *
+ * @param {{[key: string]: any}} data
  * @returns {string}
  */
 function getParams(data) {
@@ -81,21 +93,25 @@ function getParams(data) {
 
 
 /**
+ * Slack API helper for GET-requests
+ *
  * @param {string} token
  * @param {string} path
- * @param {Object} data
- * @returns {Object[]}
+ * @param {{[key: string]: string}} data
+ * @returns {Object}
  */
 function getApi(token, path, data) {
   let url = apiUrl(path) + getParams(data);
   let params = prepareFetchParams(token);
 
   let response = UrlFetchApp.fetch(url, params);
-  return JSON.parse(response);
+  return JSON.parse(response.getContentText());
 }
 
 
 /**
+ * Get Slack channel messages
+ *
  * @param {string} token
  * @param {string} channelId
  * @param {string} [nextCursor]
@@ -114,8 +130,10 @@ function readHistory(token, channelId, nextCursor) {
 
 
 /**
+ * Get Slack channel member IDs
+ *
  * @param {string} channelId
- * @returns {Object[]}
+ * @returns {string[]}
  */
 function getMembers(channelId) {
   let token = getScriptProperties().SLACK_TOKEN;
@@ -135,6 +153,8 @@ function getMembers(channelId) {
 
 
 /**
+ * Get user info by user ID
+ *
  * @param {string} userId
  * @returns {User}
  */
@@ -149,6 +169,8 @@ function getUserInfo(userId) {
 
 
 /**
+ * Remove buttons from the previous message
+ *
  * @param {string} token
  * @param {string} channelId
  * @param {string} appId
@@ -181,6 +203,8 @@ function disarmLastMessage(token, channelId, appId) {
 
 
 /**
+ * Wrapper for disarmLastMessage to call it from Menu.js
+ *
  * @param {string} channelId
  */
 function disarmLastMessageUi(channelId) {
@@ -191,9 +215,12 @@ function disarmLastMessageUi(channelId) {
 
 
 /**
+ * Create a plain/markdown message
+ *
  * @param {Host} next
  * @param {Host} afterNext
  * @param {boolean} [markdown]
+ * @returns {string}
  */
 function composeText(next, afterNext, markdown) {
   let nextName = markdown ? `<@${next.slackId}>` : next.name;
@@ -218,6 +245,8 @@ function composeText(next, afterNext, markdown) {
 
 
 /**
+ * Remove buttons from message blocks
+ *
  * @param {Object[]} blocks
  * @param {string} blocks[].type
  * @returns {Object[]}
@@ -228,6 +257,8 @@ function removeActions(blocks) {
 
 
 /**
+ * Add `Sipped` mark to a message
+ *
  * @param {Object} message
  * @param {Object[]} message.blocks
  * @param {string} responseUrl
@@ -256,6 +287,10 @@ function markMessageSkipped(message, responseUrl) {
 
 
 /**
+ * Post message to Slack channel
+ * Change existing message if responseUrl is specified
+ * Delete previous and post a new one if not
+ *
  * @param {Host} next
  * @param {Host} afterNext
  * @param {Object} params
@@ -349,6 +384,8 @@ function sendMessage(next, afterNext, params) {
 
 
 /**
+ * Add integration (bot) to a channel
+ *
  * @param {string} channelId
  */
 function joinChannel(channelId) {
@@ -362,6 +399,8 @@ function joinChannel(channelId) {
 
 
 /**
+ * Remove integration (bot) from a channel
+ *
  * @param {string} channelId
  */
 function leaveChannel(channelId) {
@@ -375,6 +414,8 @@ function leaveChannel(channelId) {
 
 
 /**
+ * Check a channel validity/accessibility
+ *
  * @param {string} channelId
  * @returns {boolean}
  */
