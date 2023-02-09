@@ -22,92 +22,111 @@ describe(tzDate.name, function () {
 let schedule = [true, true, true, true, true, false, false];
 let data = [
     [
+        "should be today if current time is before today's meeting time",
         {
             startPoint: new Date("2023-02-06 00:00"),
             timeAt: new Date("1900-01-01 11:00"),
             timeZone: "Europe/Kiev",
             schedule,
         },
-        new Date("2023-02-06 01:23:45"),
-        new Date("2023-02-06 09:00+00:00"),
+        new Date("2023-02-06 01:23:45+00:00"),
+        new Date("2023-02-06 11:00+02:00"),
     ],
     [
+        "should be next day if current time is after today's meeting time",
         {
             startPoint: new Date("2023-02-06 00:00"),
             timeAt: new Date("1900-01-01 11:00"),
             timeZone: "Europe/Kiev",
             schedule,
         },
-        new Date("2023-02-10 11:00:01"),
-        new Date("2023-02-13 09:00+00:00"),
+        new Date("2023-02-06 10:23:45+00:00"),
+        new Date("2023-02-07 11:00+02:00"),
     ],
     [
+        "should be next week if current time is before a weekend",
         {
             startPoint: new Date("2023-02-06 00:00"),
             timeAt: new Date("1900-01-01 11:00"),
             timeZone: "Europe/Kiev",
             schedule,
         },
-        new Date("2023-03-31 11:00:01"),
-        new Date("2023-04-03 08:00+00:00"),
-    ],
-    [
-        {
-            startPoint: new Date("2023-02-06 12:00"),
-            timeAt: new Date("1900-01-01 11:00"),
-            timeZone: "Europe/Kiev",
-            schedule,
-        },
-        new Date("2023-02-06 09:00"),
-        new Date("2023-02-07 11:00+02:00"),
-    ],
-    [
-        {
-            startPoint: new Date("2023-02-06 12:00"),
-            timeAt: new Date("1900-01-01 11:00"),
-            timeZone: "Europe/Kiev",
-            schedule,
-        },
-        new Date("2023-02-06 13:00"),
-        new Date("2023-02-07 11:00+02:00"),
-    ],
-    [
-        {
-            startPoint: new Date("2023-02-06 12:00"),
-            timeAt: new Date("1900-01-01 11:00"),
-            timeZone: "Europe/Kiev",
-            schedule,
-        },
-        new Date("2023-02-07 09:00"),
-        new Date("2023-02-07 11:00+02:00"),
-    ],
-    [
-        {
-            startPoint: new Date("2023-02-13 00:00"),
-            timeAt: new Date("1900-01-01 11:00"),
-            timeZone: "Europe/Kiev",
-            schedule,
-        },
-        new Date("2023-02-06 08:32"),
+        new Date("2023-02-10 09:00:01+00:00"),
         new Date("2023-02-13 11:00+02:00"),
     ],
     [
+        "should be at the same time if current time is before daylight saving change",
+        {
+            startPoint: new Date("2023-02-06 00:00"),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule,
+        },
+        new Date("2023-03-31 09:00:01+00:00"),
+        new Date("2023-04-03 11:00+03:00"),
+    ],
+    [
+        "should be next day if start point in the middle of a day and current time is before it",
+        {
+            startPoint: new Date("2023-02-06 12:00"),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule,
+        },
+        new Date("2023-02-06 07:00+00:00"),
+        new Date("2023-02-07 11:00+02:00"),
+    ],
+    [
+        "should be next day if start point in the middle of a day and current time is after it",
+        {
+            startPoint: new Date("2023-02-06 12:00"),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule,
+        },
+        new Date("2023-02-06 13:00+00:00"),
+        new Date("2023-02-07 11:00+02:00"),
+    ],
+    [
+        "should be today if start point in the middle of a day and current time is the next day after it before meeting time",
+        {
+            startPoint: new Date("2023-02-06 12:00"),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule,
+        },
+        new Date("2023-02-07 07:00+00:00"),
+        new Date("2023-02-07 11:00+02:00"),
+    ],
+    [
+        "should be on start point if start point in the future and current time is before meeting time",
         {
             startPoint: new Date("2023-02-13 00:00"),
             timeAt: new Date("1900-01-01 11:00"),
             timeZone: "Europe/Kiev",
             schedule,
         },
-        new Date("2023-02-06 12:48"),
+        new Date("2023-02-06 08:32+00:00"),
+        new Date("2023-02-13 11:00+02:00"),
+    ],
+    [
+        "should be on start point if start point in the future and current time is after meeting time",
+        {
+            startPoint: new Date("2023-02-13 00:00"),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule,
+        },
+        new Date("2023-02-06 12:48+00:00"),
         new Date("2023-02-13 11:00+02:00"),
     ],
 ]
 
 
 describe(getNextMeeting.name, function () {
-    itParam("should be ${value[2]}", data, function (value) {
-        Schedule.__with__({"getNow": () => value[1]})(function () {
-            assert.deepStrictEqual(getNextMeeting(value[0]), value[2]);
+    itParam("${value[0]}", data, function (value) {
+        Schedule.__with__({"getNow": () => value[2]})(function () {
+            assert.deepStrictEqual(getNextMeeting(value[1]), value[3]);
         });
     });
 });
