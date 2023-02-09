@@ -3,6 +3,7 @@
     "@google/clasp": "^2.4.2",
     "@types/google-apps-script": "^1.0.57",
     "mocha": "^8.4.0",
+    "mocha-param": "^2.0.1",
     "rewire": "^6.0.0"
   }
 }

@@ -52,13 +52,21 @@ function tzDate(date, timeZone) {
 
 
 /**
+ * @returns {Date}
+ */
+function getNow() {
+  return new Date();
+}
+
+
+/**
  * @param {ScheduleData} scheduleData
  * @returns {Date}
  */
 function getNextMeeting(scheduleData) {
   if (!(scheduleData.startPoint && scheduleData.timeAt && scheduleData.timeZone)) return;
 
-  let now = new Date();
+  let now = getNow();
   let startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
 
   let schedule = [...scheduleData.schedule.slice(startDay), ...scheduleData.schedule.slice(0, startDay)];
