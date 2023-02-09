@@ -5,5 +5,8 @@
     "mocha": "^8.4.0",
     "mocha-param": "^2.0.1",
     "rewire": "^6.0.0"
+  },
+  "scripts": {
+    "test": "mocha"
   }
 }
