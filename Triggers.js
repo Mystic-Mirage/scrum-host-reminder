@@ -9,10 +9,10 @@ const [TRIGGER_UID_ROW, TRIGGER_UID_COLUMN] = [1, 9];
  * @param {string} [responseUrl]
  */
 function nextHostMessage(sheet, responseUrl) {
-  let [next, afterNext] = nextHosts(sheet);
+  let [next, nextAfter] = nextHosts(sheet);
   if (next) {
     let channelId = sheet.getName();
-    sendMessage(next, afterNext, {channelId, responseUrl});
+    sendMessage(next, nextAfter, {channelId, responseUrl});
   }
 }
 

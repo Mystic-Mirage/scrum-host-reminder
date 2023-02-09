@@ -218,21 +218,21 @@ function disarmLastMessageUi(channelId) {
  * Create a plain/markdown message
  *
  * @param {Host} next
- * @param {Host} afterNext
+ * @param {Host} nextAfter
  * @param {boolean} [markdown]
  * @returns {string}
  */
-function composeText(next, afterNext, markdown) {
+function composeText(next, nextAfter, markdown) {
   let nextName = markdown ? `<@${next.slackId}>` : next.name;
   let messageLines = [
     "Hello!",
     `This is a friendly reminder that ${nextName} is hosting today's stand-up meeting${markdown ? "" : "."}`,
   ]
 
-  if (afterNext) {
-    let nextAfterName = markdown ? `*${afterNext.name}*` : afterNext.name;
-    let suffix = afterNext.name.endsWith("s") ? "" : "s";
-    let footer = `Next time it's ${nextAfterName}'${suffix} turn${next.slackId === afterNext.slackId ? " again" : ""}`;
+  if (nextAfter) {
+    let nextAfterName = markdown ? `*${nextAfter.name}*` : nextAfter.name;
+    let suffix = nextAfter.name.endsWith("s") ? "" : "s";
+    let footer = `Next time it's ${nextAfterName}'${suffix} turn${next.slackId === nextAfter.slackId ? " again" : ""}`;
     if (markdown) {
       messageLines.push(`_${footer}_`);
     } else {
@@ -292,22 +292,22 @@ function markMessageSkipped(message, responseUrl) {
  * Delete previous and post a new one if not
  *
  * @param {Host} next
- * @param {Host} afterNext
+ * @param {Host} nextAfter
  * @param {Object} params
  * @param {string} [params.channelId]
  * @param {string} [params.responseUrl]
  */
-function sendMessage(next, afterNext, params) {
+function sendMessage(next, nextAfter, params) {
   let props = getScriptProperties();
 
   let data = {
-    text: composeText(next, afterNext),
+    text: composeText(next, nextAfter),
     blocks: [
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: composeText(next, afterNext, true),
+          text: composeText(next, nextAfter, true),
         },
       },
       {

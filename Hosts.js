@@ -9,6 +9,8 @@
 
 
 /**
+ * Retrieve hosts from a sheet
+ *
  * @param {SpreadsheetApp.Sheet} sheet
  * @returns {Host[]}
  */
@@ -30,11 +32,14 @@ function getHosts(sheet) {
 
 
 /**
+ * Get next and next after hosts from a queue
+ * Use date as mark to calculate the next one
+ *
  * @param {SpreadsheetApp.Sheet} sheet
- * @returns {Host[]}
+ * @returns {[Host, Host]}
  */
 function nextHosts(sheet) {
-  let next, afterNext;
+  let next, nextAfter;
 
   let hosts = getHosts(sheet);
   let last = hosts.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
@@ -46,7 +51,7 @@ function nextHosts(sheet) {
 
     if (host.active) {
       if (next) {
-        afterNext = host;
+        nextAfter = host;
         break;
       } else {
         next = host;
@@ -54,11 +59,13 @@ function nextHosts(sheet) {
     }
   }
 
-  return [next, afterNext];
+  return [next, nextAfter];
 }
 
 
 /**
+ * Remove date from current host so it will be re-elected as next host again
+ *
  * @param {SpreadsheetApp.Sheet} sheet
  */
 function skipMeeting(sheet) {
