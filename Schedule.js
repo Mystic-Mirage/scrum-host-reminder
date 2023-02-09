@@ -67,6 +67,8 @@ function getNextMeeting(scheduleData) {
   if (!(scheduleData.startPoint && scheduleData.timeAt && scheduleData.timeZone)) return;
 
   let now = getNow();
+  if (now < scheduleData.startPoint) now = scheduleData.startPoint;
+
   let startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
 
   let schedule = [...scheduleData.schedule.slice(startDay), ...scheduleData.schedule.slice(0, startDay)];

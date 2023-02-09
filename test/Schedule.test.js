@@ -81,6 +81,26 @@ let data = [
         new Date("2023-02-07 09:00"),
         new Date("2023-02-07 11:00"),
     ],
+    [
+        {
+            startPoint: new Date("2023-02-13 00:00"),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule,
+        },
+        new Date("2023-02-06 08:32"),
+        new Date("2023-02-13 11:00"),
+    ],
+    [
+        {
+            startPoint: new Date("2023-02-13 00:00"),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule,
+        },
+        new Date("2023-02-06 12:48"),
+        new Date("2023-02-13 11:00"),
+    ],
 ]
 
 
