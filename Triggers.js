@@ -3,6 +3,8 @@ const [TRIGGER_UID_ROW, TRIGGER_UID_COLUMN] = [1, 9];
 
 
 /**
+ * Find next and next after hosts and send a message mentioning them
+ *
  * @param {SpreadsheetApp.Sheet} sheet
  * @param {string} [responseUrl]
  */
@@ -16,6 +18,8 @@ function nextHostMessage(sheet, responseUrl) {
 
 
 /**
+ * Find sheet by trigger UID stored on it
+ *
  * @param {string} triggerUid
  * @returns {SpreadsheetApp.Sheet}
  */
@@ -27,6 +31,8 @@ function findSheet(triggerUid) {
 
 
 /**
+ * Delete specified trigger
+ *
  * @param {string} triggerUid
  */
 function deleteTrigger(triggerUid) {
@@ -39,6 +45,8 @@ function deleteTrigger(triggerUid) {
 
 
 /**
+ * Recreate a trigger and store its UID on a sheet named with channel ID
+ *
  * @param {SpreadsheetApp.Sheet} sheet
  */
 function replaceTrigger(sheet) {
@@ -64,7 +72,11 @@ function replaceTrigger(sheet) {
 
 
 /**
- * @param {GoogleAppsScript.Events.TimeDriven} e
+ * Time trigger for Slack notifications
+ * Recreate trigger for the next notification
+ * Delete trigger if no sheet with channel ID could be found
+ *
+ * @param {Events.TimeDriven} e
  */
 function onTimeDrivenEvent(e) {
   let sheet = findSheet(e.triggerUid);
@@ -78,7 +90,10 @@ function onTimeDrivenEvent(e) {
 
 
 /**
- * @param {GoogleAppsScript.Events.SheetsOnEdit} e
+ * Installable trigger for sheet edit events
+ * Recreate a time trigger for the next Slack notification
+ *
+ * @param {Events.SheetsOnEdit} e
  */
 function onEditEvent(e) {
   if (e.range.getColumn() > 5) {
@@ -90,8 +105,11 @@ function onEditEvent(e) {
 
 
 /**
- * @param {GoogleAppsScript.Events.DoPost} e
- * @returns {GoogleAppsScript.Content.TextOutput}
+ * Slack posts here using interactivity request URL
+ * Handle button actions
+ *
+ * @param {Events.DoPost} e
+ * @returns {Content.TextOutput}
  */
 function doPost(e) {
   let payload = JSON.parse(e.parameter.payload);
