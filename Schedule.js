@@ -12,6 +12,8 @@ const DAY_MS = 86400000;
 
 
 /**
+ * Retrieve schedule data from a sheet
+ *
  * @param {SpreadsheetApp.Sheet} sheet
  * @returns {ScheduleData}
  */
@@ -34,6 +36,8 @@ function getScheduleData(sheet) {
 
 
 /**
+ * Convert a date to a specified timezone
+ *
  * @param {Date} date
  * @param {string} timeZone
  * @returns {Date}
@@ -52,6 +56,9 @@ function tzDate(date, timeZone) {
 
 
 /**
+ * Get current date
+ * Separate function to mock it in tests
+ *
  * @returns {Date}
  */
 function getNow() {
@@ -60,8 +67,10 @@ function getNow() {
 
 
 /**
+ * Calculate next meeting date using schedule data
+ *
  * @param {ScheduleData} scheduleData
- * @returns {Date}
+ * @returns {Date | undefined}
  */
 function getNextMeeting(scheduleData) {
   if (!(scheduleData.startPoint && scheduleData.timeAt && scheduleData.timeZone)) return;
