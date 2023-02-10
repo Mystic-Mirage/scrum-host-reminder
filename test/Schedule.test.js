@@ -20,12 +20,12 @@ describe(tzDate.name, function () {
 
 
 /**
- * @param {string} startPointString
+ * @param {string} startPoint
  * @returns {ScheduleData}
  */
-function getScheduleData(startPointString) {
+function scheduleData(startPoint) {
     return {
-        startPoint: new Date(startPointString),
+        startPoint: new Date(startPoint),
         timeAt: new Date("1900-01-01 11:00"),
         timeZone: "Europe/Kiev",
         triggerUid: "",
@@ -34,68 +34,95 @@ function getScheduleData(startPointString) {
 }
 
 
+/**
+ * @typedef NextMeetingParam
+ * @property {string} desc
+ * @property {ScheduleData} scheduleData
+ * @property {Date} now
+ * @property {Date} expected
+ */
+
+
+
+/**
+ * @param {string} desc
+ * @param {string} startPoint
+ * @param {string} now
+ * @param {string} expected
+ * @returns {NextMeetingParam}
+ */
+function getNextMeetingParam(desc, startPoint, now, expected) {
+    return {
+        desc,
+        scheduleData: scheduleData(startPoint),
+        now: new Date(now),
+        expected: new Date(expected),
+    }
+}
+
+
 let getNextMeetingParams = [
-    [
+    getNextMeetingParam(
         "should be today if current time is before today's meeting time",
-        getScheduleData("2023-02-06 00:00"),
-        new Date("2023-02-06 01:23:45+00:00"),
-        new Date("2023-02-06 11:00+02:00"),
-    ],
-    [
+        "2023-02-06 00:00",
+        "2023-02-06 01:23:45+00:00",
+        "2023-02-06 11:00+02:00",
+    ),
+    getNextMeetingParam(
         "should be next day if current time is after today's meeting time",
-        getScheduleData("2023-02-06 00:00"),
-        new Date("2023-02-06 10:23:45+00:00"),
-        new Date("2023-02-07 11:00+02:00"),
-    ],
-    [
+        "2023-02-06 00:00",
+        "2023-02-06 10:23:45+00:00",
+        "2023-02-07 11:00+02:00",
+    ),
+    getNextMeetingParam(
         "should be next week if current time is before a weekend",
-        getScheduleData("2023-02-06 00:00"),
-        new Date("2023-02-10 09:00:01+00:00"),
-        new Date("2023-02-13 11:00+02:00"),
-    ],
-    [
+        "2023-02-06 00:00",
+        "2023-02-10 09:00:01+00:00",
+        "2023-02-13 11:00+02:00",
+    ),
+    getNextMeetingParam(
         "should be at the same time if current time is before daylight saving change",
-        getScheduleData("2023-02-06 00:00"),
-        new Date("2023-03-31 09:00:01+00:00"),
-        new Date("2023-04-03 11:00+03:00"),
-    ],
-    [
+        "2023-02-06 00:00",
+        "2023-03-31 09:00:01+00:00",
+        "2023-04-03 11:00+03:00",
+    ),
+    getNextMeetingParam(
         "should be next day if start point in the middle of a day and current time is before it",
-        getScheduleData("2023-02-06 12:00"),
-        new Date("2023-02-06 07:00+00:00"),
-        new Date("2023-02-07 11:00+02:00"),
-    ],
-    [
+        "2023-02-06 12:00",
+        "2023-02-06 07:00+00:00",
+        "2023-02-07 11:00+02:00",
+    ),
+    getNextMeetingParam(
         "should be next day if start point in the middle of a day and current time is after it",
-        getScheduleData("2023-02-06 12:00"),
-        new Date("2023-02-06 13:00+00:00"),
-        new Date("2023-02-07 11:00+02:00"),
-    ],
-    [
+        "2023-02-06 12:00",
+        "2023-02-06 13:00+00:00",
+        "2023-02-07 11:00+02:00",
+    ),
+    getNextMeetingParam(
         "should be today if start point in the middle of a day and current time is the next day after it before meeting time",
-        getScheduleData("2023-02-06 12:00"),
-        new Date("2023-02-07 07:00+00:00"),
-        new Date("2023-02-07 11:00+02:00"),
-    ],
-    [
+        "2023-02-06 12:00",
+        "2023-02-07 07:00+00:00",
+        "2023-02-07 11:00+02:00",
+    ),
+    getNextMeetingParam(
         "should be on start point if start point in the future and current time is before meeting time",
-        getScheduleData("2023-02-13 00:00"),
-        new Date("2023-02-06 08:32+00:00"),
-        new Date("2023-02-13 11:00+02:00"),
-    ],
-    [
+        "2023-02-13 00:00",
+        "2023-02-06 08:32+00:00",
+        "2023-02-13 11:00+02:00",
+    ),
+    getNextMeetingParam(
         "should be on start point if start point in the future and current time is after meeting time",
-        getScheduleData("2023-02-13 00:00"),
-        new Date("2023-02-06 12:48+00:00"),
-        new Date("2023-02-13 11:00+02:00"),
-    ],
+        "2023-02-13 00:00",
+        "2023-02-06 12:48+00:00",
+        "2023-02-13 11:00+02:00",
+    ),
 ]
 
 
 describe(getNextMeeting.name, function () {
-    itParam("${value[0]}", getNextMeetingParams, function (value) {
-        Schedule.__with__({"getNow": () => value[2]})(function () {
-            assert.deepStrictEqual(getNextMeeting(value[1]), value[3]);
+    itParam("${value.desc}", getNextMeetingParams, function (value) {
+        Schedule.__with__({"getNow": () => value.now})(function () {
+            assert.deepStrictEqual(getNextMeeting(value.scheduleData), value.expected);
         });
     });
 });
