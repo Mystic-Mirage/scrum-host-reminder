@@ -18,6 +18,17 @@ function nextHostMessage(sheet, responseUrl) {
 
 
 /**
+ * Return a range where trigger UID is stored
+ *
+ * @param {SpreadsheetApp.Sheet} sheet
+ * @returns {SpreadsheetApp.Range}
+ */
+function getTriggerRange(sheet) {
+  return /** @type {SpreadsheetApp.Range} */ sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN);
+}
+
+
+/**
  * Find sheet by trigger UID stored on it
  *
  * @param {string} triggerUid
@@ -26,7 +37,7 @@ function nextHostMessage(sheet, responseUrl) {
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
   return sheets.find((sheet) => sheet.getName() !== TIMEZONES_SHEET_NAME &&
-    sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN).getValue().toString() === triggerUid);
+    getTriggerRange(sheet).getValue().toString() === triggerUid);
 }
 
 
@@ -56,7 +67,7 @@ function replaceTrigger(sheet) {
 
   deleteTrigger(scheduleData.triggerUid);
 
-  let triggerRange = sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN);
+  let triggerRange = getTriggerRange(sheet);
   let nextMeeting = getNextMeeting(scheduleData);
   if (nextMeeting) {
     let trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
