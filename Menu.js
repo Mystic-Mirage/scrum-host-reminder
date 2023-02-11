@@ -200,18 +200,3 @@ function deleteSheet() {
   slack.disarmLastMessage(channelId);
   slack.leaveChannel(channelId);
 }
-
-
-/**
- * Create a menu on spreadsheet open
- */
-function onOpen() {
-  const ui = SpreadsheetApp.getUi();
-  ui.createMenu("Scrum Host Reminder")
-    .addItem("Add Slack channel", addChannel.name)
-    .addSeparator()
-    .addItem("Re-read the channel members", reReadMembers.name)
-    .addSeparator()
-    .addItem("Delete current channel", deleteSheet.name)
-    .addToUi();
-}
