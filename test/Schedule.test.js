@@ -3,45 +3,20 @@ let assert = require("assert");
 let itParam = require("mocha-param");
 let rewire = require("rewire");
 
-let Schedule = rewire("../Schedule.js");
-let tzDate = Schedule.__get__("tzDate");
-let getNextMeeting = Schedule.__get__("getNextMeeting");
+const ScheduleModule = rewire("../Schedule.js");
+/** @type {Class<Schedule> & typeof Schedule} */
+const Schedule = ScheduleModule.__get__("Schedule");
 
 
-describe(tzDate.name, function () {
+describe(Schedule.tzDate.name, function () {
     it("should be 01:00 (UTC) when 03:00 (Kyiv) in Winter", function () {
-        assert.deepStrictEqual(tzDate(new Date("2023-02-06 03:00"), "Europe/Kiev"), new Date("2023-02-06 01:00+00:00"));
+        assert.deepStrictEqual(Schedule.tzDate(new Date("2023-02-06 03:00"), "Europe/Kiev"), new Date("2023-02-06 01:00+00:00"));
     });
 
     it("should be 00:00 (UTC) when 03:00 (Kyiv) in Summer", function () {
-        assert.deepStrictEqual(tzDate(new Date("2023-07-17 03:00"), "Europe/Kiev"), new Date("2023-07-17 00:00+00:00"));
+        assert.deepStrictEqual(Schedule.tzDate(new Date("2023-07-17 03:00"), "Europe/Kiev"), new Date("2023-07-17 00:00+00:00"));
     });
 });
-
-
-/**
- * @param {string} startPoint
- * @returns {ScheduleData}
- */
-function scheduleData(startPoint) {
-    return {
-        startPoint: new Date(startPoint),
-        timeAt: new Date("1900-01-01 11:00"),
-        timeZone: "Europe/Kiev",
-        triggerUid: "",
-        schedule: [true, true, true, true, true, false, false],
-    }
-}
-
-
-/**
- * @typedef NextMeetingParam
- * @property {string} desc
- * @property {ScheduleData} scheduleData
- * @property {Date} now
- * @property {Date} expected
- */
-
 
 
 /**
@@ -49,12 +24,17 @@ function scheduleData(startPoint) {
  * @param {string} startPoint
  * @param {string} now
  * @param {string} expected
- * @returns {NextMeetingParam}
+ * @returns {{desc: string, scheduleData: Object, now: Date, expected: date}}
  */
 function getNextMeetingParam(desc, startPoint, now, expected) {
     return {
         desc,
-        scheduleData: scheduleData(startPoint),
+        scheduleData: {
+            startPoint: new Date(startPoint),
+            timeAt: new Date("1900-01-01 11:00"),
+            timeZone: "Europe/Kiev",
+            schedule: [true, true, true, true, true, false, false],
+        },
         now: new Date(now),
         expected: new Date(expected),
     }
@@ -119,10 +99,13 @@ let getNextMeetingParams = [
 ]
 
 
-describe(getNextMeeting.name, function () {
+describe(Schedule.prototype.getNextMeeting.name, function () {
     itParam("${value.desc}", getNextMeetingParams, function (value) {
-        Schedule.__with__({"getNow": () => value.now})(function () {
-            assert.deepStrictEqual(getNextMeeting(value.scheduleData), value.expected);
+        ScheduleModule.__with__({
+            "Schedule.getNow": () => value.now,
+            "Schedule.prototype.getScheduleData": () => value.scheduleData,
+        })(function () {
+            assert.deepStrictEqual(new Schedule().getNextMeeting(), value.expected);
         });
     });
 });

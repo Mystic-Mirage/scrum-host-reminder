@@ -1,5 +1,4 @@
 const TIMEZONES_SHEET_NAME = "timezones";
-const [TRIGGER_UID_ROW, TRIGGER_UID_COLUMN] = [1, 9];
 
 
 /**
@@ -18,17 +17,6 @@ function nextHostMessage(sheet, responseUrl) {
 
 
 /**
- * Return a range where trigger UID is stored
- *
- * @param {SpreadsheetApp.Sheet} sheet
- * @returns {SpreadsheetApp.Range}
- */
-function getTriggerRange(sheet) {
-  return /** @type {SpreadsheetApp.Range} */ sheet.getRange(TRIGGER_UID_ROW, TRIGGER_UID_COLUMN);
-}
-
-
-/**
  * Find sheet by trigger UID stored on it
  *
  * @param {string} triggerUid
@@ -37,7 +25,7 @@ function getTriggerRange(sheet) {
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
   return sheets.find((sheet) => sheet.getName() !== TIMEZONES_SHEET_NAME &&
-    getTriggerRange(sheet).getValue().toString() === triggerUid);
+    new Schedule(sheet).getTriggerUid() === triggerUid);
 }
 
 
@@ -63,21 +51,20 @@ function deleteTrigger(triggerUid) {
 function replaceTrigger(sheet) {
   LockService.getScriptLock().waitLock(60000);
 
-  let scheduleData = getScheduleData(sheet);
+  let schedule = new Schedule(sheet);
 
-  deleteTrigger(scheduleData.triggerUid);
+  deleteTrigger(schedule.getTriggerUid());
 
-  let triggerRange = getTriggerRange(sheet);
-  let nextMeeting = getNextMeeting(scheduleData);
+  let nextMeeting = schedule.getNextMeeting();
   if (nextMeeting) {
     let trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
       .timeBased()
       .at(nextMeeting)
       .create();
 
-    triggerRange.setValue(trigger.getUniqueId());
+    schedule.setTriggerUid(trigger.getUniqueId());
   } else {
-    triggerRange.clearContent();
+    schedule.deleteTriggerUid();
   }
 }
 

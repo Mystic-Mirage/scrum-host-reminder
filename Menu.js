@@ -70,7 +70,7 @@ function newSheet(channelId) {
     ]
   );
 
-  getTriggerRange(sheet).protect().setWarningOnly(true);
+  new Schedule(sheet).getTriggerRange().protect().setWarningOnly(true);
 
   sheet.getRange(2, 6, 2, 7)
     .insertCheckboxes()
@@ -183,9 +183,9 @@ function deleteSheet() {
 
   if (sheetName !== channelId) return;
 
-  let triggerRange = getTriggerRange(sheet);
-  deleteTrigger(triggerRange.getValue().toString());
-  triggerRange.clearContent();
+  let schedule = new Schedule(sheet);
+  deleteTrigger(schedule.getTriggerUid());
+  schedule.deleteTriggerUid();
 
   spreadsheet.deleteSheet(sheet);
   disarmLastMessageUi(channelId);
