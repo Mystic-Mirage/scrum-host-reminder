@@ -11,7 +11,7 @@ function nextHostMessage(sheet, responseUrl) {
   let [next, nextAfter] = nextHosts(sheet);
   if (next) {
     let channelId = sheet.getName();
-    sendMessage(next, nextAfter, {channelId, responseUrl});
+    new Slack().sendMessage(next, nextAfter, channelId, responseUrl);
   }
 }
 
@@ -119,7 +119,7 @@ function doPost(e) {
       break;
     case "skip-meeting":
       skipMeeting(sheet);
-      markMessageSkipped(payload.message, payload.response_url)
+      new Slack().markMessageSkipped(payload.message, payload.response_url)
       break;
   }
 

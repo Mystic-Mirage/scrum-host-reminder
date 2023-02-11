@@ -81,11 +81,13 @@ function newSheet(channelId) {
       ]
     );
 
-  let members = getMembers(channelId);
+  const slack = new Slack();
+
+  let members = slack.getMembers(channelId);
   if (members) {
     let rowIndex = 0;
     for (let userId of members) {
-      let user = getUserInfo(userId);
+      let user = slack.getUserInfo(userId);
       if (!user.is_bot) {
         rowIndex++;
         sheet.getRange(rowIndex, 3).insertCheckboxes();
@@ -107,13 +109,15 @@ function addChannel() {
 
   if (!channelId) return;
 
-  if (!checkChannel(channelId)) {
+  const slack = new Slack();
+
+  if (!slack.checkChannel(channelId)) {
     ui.alert("Wrong channel ID", "Note: add the bot first if a channel is private", ui.ButtonSet.OK);
     return;
   }
 
   newSheet(channelId);
-  joinChannel(channelId);
+  slack.joinChannel(channelId);
 }
 
 
@@ -135,7 +139,10 @@ function reReadMembers() {
   if (result === ui.Button.NO) return;
 
   let hosts = getHosts(sheet);
-  let members = getMembers(sheetName);
+
+  const slack = new Slack();
+
+  let members = slack.getMembers(sheetName);
 
   sheet.getRange(1, 1, sheet.getMaxRows(), 4).clear().removeCheckboxes();
 
@@ -147,7 +154,7 @@ function reReadMembers() {
       sheet.getRange(rowIndex, 3).insertCheckboxes();
       sheet.getRange(rowIndex, 1, 1, 4).setValues([[host.name, host.slackId, host.active, host.timestamp]]);
     } else {
-      let user = getUserInfo(userId);
+      let user = slack.getUserInfo(userId);
       if (!user.is_bot) {
         rowIndex++;
         sheet.getRange(rowIndex, 3).insertCheckboxes();
@@ -188,8 +195,10 @@ function deleteSheet() {
   schedule.deleteTriggerUid();
 
   spreadsheet.deleteSheet(sheet);
-  disarmLastMessageUi(channelId);
-  leaveChannel(channelId);
+
+  const slack = new Slack();
+  slack.disarmLastMessage(channelId);
+  slack.leaveChannel(channelId);
 }
 
 
