@@ -1,5 +1,6 @@
 const TIMESTAMP_COLUMN = 4;
 
+
 /**
  * @typedef {Object} Host
  * @property {number} row
@@ -67,13 +68,12 @@ class Hosts {
    * @returns {[Host, Host]}
    */
   getNext() {
-    let next, nextAfter;
-
     const hosts = this.getAll();
     const last = getLastHost(hosts);
     const nextIndex = hosts.indexOf(last) + 1;
     const hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
 
+    let next, nextAfter;
     for (const host of hostsCarrousel) {
       if (!next) this.getTimestampRange(host).setValue(new Date());
 
