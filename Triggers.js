@@ -101,7 +101,6 @@ function onEditEvent(e) {
 }
 
 
-
 /**
  * Slack posts here using interactivity request URL
  * Handle button actions
