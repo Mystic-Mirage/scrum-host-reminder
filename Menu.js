@@ -4,9 +4,9 @@
  * @returns {Date}
  */
 function getStartOfWeek() {
-  let date = new Date();
-  let day = date.getDay();
-  let diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  const date = new Date();
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
   date.setDate(diff);
   date.setHours(0, 0, 0, 0);
 
@@ -20,10 +20,10 @@ function getStartOfWeek() {
  * @param {string} channelId
  */
 function newSheet(channelId) {
-  let spreadsheet = SpreadsheetApp.getActive();
-  let sheet = spreadsheet.insertSheet();
+  const spreadsheet = SpreadsheetApp.getActive();
+  const sheet = spreadsheet.insertSheet();
   sheet.protect().setDomainEdit(false);
-  let totalSheets = spreadsheet.getNumSheets();
+  const totalSheets = spreadsheet.getNumSheets();
   spreadsheet.moveActiveSheet(totalSheets);
   sheet.setName(channelId);
 
@@ -34,25 +34,25 @@ function newSheet(channelId) {
 
   sheet.getRange(1, 5, sheet.getMaxRows()).setBackground("#efefef");
 
-  let startOfWeek = getStartOfWeek();
+  const startOfWeek = getStartOfWeek();
   sheet.getRange(1, 6).setNumberFormat("yyyy-mm-dd").setValue(startOfWeek);
   sheet.getRange(1, 7).setNumberFormat("hh:mm");
 
-  let dateTimeRange = sheet.getRange(1, 6, 1, 2);
-  let dateTimeValidation = SpreadsheetApp.newDataValidation()
+  const dateTimeRange = sheet.getRange(1, 6, 1, 2);
+  const dateTimeValidation = SpreadsheetApp.newDataValidation()
     .requireDate()
     .setAllowInvalid(false)
     .build();
   dateTimeRange.setDataValidation(dateTimeValidation);
 
-  let tzRangeSource = spreadsheet.getRange(`${timezonesSheetName}!A:A`);
-  let tzValidation = SpreadsheetApp.newDataValidation()
+  const tzRangeSource = spreadsheet.getRange(`${timezonesSheetName}!A:A`);
+  const tzValidation = SpreadsheetApp.newDataValidation()
     .requireValueInRange(tzRangeSource, false)
     .setAllowInvalid(false)
     .build();
   sheet.getRange(1, 8).setDataValidation(tzValidation).setValue("UTC");
 
-  let scheduleDataFormatting = SpreadsheetApp.newConditionalFormatRule()
+  const scheduleDataFormatting = SpreadsheetApp.newConditionalFormatRule()
     .whenCellEmpty()
     .setBackground("#f4cccc")
     .setRanges([sheet.getRange(1, 6, 1, 3)])
@@ -83,11 +83,11 @@ function newSheet(channelId) {
 
   const slack = new Slack();
 
-  let members = slack.getMembers(channelId);
+  const members = slack.getMembers(channelId);
   if (members) {
     let rowIndex = 0;
-    for (let userId of members) {
-      let user = slack.getUserInfo(userId);
+    for (const userId of members) {
+      const user = slack.getUserInfo(userId);
       if (!user.is_bot) {
         rowIndex++;
         sheet.getRange(rowIndex, 3).insertCheckboxes();
@@ -103,9 +103,9 @@ function newSheet(channelId) {
  * Add new channel menu item handler
  */
 function addChannel() {
-  let ui = SpreadsheetApp.getUi();
-  let result = ui.prompt("Enter Slack channel ID");
-  let channelId = result.getResponseText();
+  const ui = SpreadsheetApp.getUi();
+  const result = ui.prompt("Enter Slack channel ID");
+  const channelId = result.getResponseText();
 
   if (!channelId) return;
 
@@ -125,36 +125,37 @@ function addChannel() {
  * Re-read member list menu item handler
  */
 function reReadMembers() {
-  let ui = SpreadsheetApp.getUi();
-  let sheet = SpreadsheetApp.getActive().getActiveSheet();
-  let sheetName = sheet.getName();
+  const ui = SpreadsheetApp.getUi();
+  const sheet = SpreadsheetApp.getActive().getActiveSheet();
+  const sheetName = sheet.getName();
+  const channelId = sheetName;
 
   if (sheetName === timezonesSheetName) {
     ui.alert(`You cannot do this with "${timezonesSheetName}"!`);
     return;
   }
 
-  let result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
+  const result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
 
   if (result === ui.Button.NO) return;
 
-  let hosts = getHosts(sheet);
+  const hosts = getHosts(sheet);
 
   const slack = new Slack();
 
-  let members = slack.getMembers(sheetName);
+  const members = slack.getMembers(channelId);
 
   sheet.getRange(1, 1, sheet.getMaxRows(), 4).clear().removeCheckboxes();
 
   let rowIndex = 0;
-  for (let userId of members) {
-    let host = hosts.find((host) => host.slackId === userId);
+  for (const userId of members) {
+    const host = hosts.find((host) => host.slackId === userId);
     if (host) {
       rowIndex++;
       sheet.getRange(rowIndex, 3).insertCheckboxes();
       sheet.getRange(rowIndex, 1, 1, 4).setValues([[host.name, host.slackId, host.active, host.timestamp]]);
     } else {
-      let user = slack.getUserInfo(userId);
+      const user = slack.getUserInfo(userId);
       if (!user.is_bot) {
         rowIndex++;
         sheet.getRange(rowIndex, 3).insertCheckboxes();
@@ -171,26 +172,26 @@ function reReadMembers() {
  * Delete sheet menu item handler
  */
 function deleteSheet() {
-  let ui = SpreadsheetApp.getUi();
+  const ui = SpreadsheetApp.getUi();
 
-  let spreadsheet = SpreadsheetApp.getActive();
-  let sheet = spreadsheet.getActiveSheet();
-  let sheetName = sheet.getName();
+  const spreadsheet = SpreadsheetApp.getActive();
+  const sheet = spreadsheet.getActiveSheet();
+  const sheetName = sheet.getName();
 
   if (sheetName === timezonesSheetName) {
     ui.alert(`You cannot delete "${timezonesSheetName}"!`);
     return;
   }
 
-  let result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);
+  const result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);
   if (result === ui.Button.NO) return;
 
-  let channelId = ui.prompt("Confirm by entering channel ID", ).getResponseText();
+  const channelId = ui.prompt("Confirm by entering channel ID", ).getResponseText();
   if (!channelId) return;
 
   if (sheetName !== channelId) return;
 
-  let schedule = new Schedule(sheet);
+  const schedule = new Schedule(sheet);
   deleteTrigger(schedule.getTriggerUid());
   schedule.deleteTriggerUid();
 
@@ -206,7 +207,7 @@ function deleteSheet() {
  * Create a menu on spreadsheet open
  */
 function onOpen() {
-  let ui = SpreadsheetApp.getUi();
+  const ui = SpreadsheetApp.getUi();
   ui.createMenu("Scrum Host Reminder")
     .addItem("Add Slack channel", addChannel.name)
     .addSeparator()

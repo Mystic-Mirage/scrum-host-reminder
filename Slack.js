@@ -215,7 +215,7 @@ class Slack {
    * @param {string} responseUrl
    */
   markMessageSkipped(message, responseUrl) {
-    let blocks = removeActions(message.blocks);
+    const blocks = removeActions(message.blocks);
     blocks.push(
       {
         type: "section",

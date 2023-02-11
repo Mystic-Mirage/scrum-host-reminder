@@ -8,9 +8,9 @@ const timezonesSheetName = "timezones";
  * @param {string} [responseUrl]
  */
 function nextHostMessage(sheet, responseUrl) {
-  let [next, nextAfter] = nextHosts(sheet);
+  const [next, nextAfter] = nextHosts(sheet);
   if (next) {
-    let channelId = sheet.getName();
+    const channelId = sheet.getName();
     new Slack().sendMessage(next, nextAfter, channelId, responseUrl);
   }
 }
@@ -23,7 +23,7 @@ function nextHostMessage(sheet, responseUrl) {
  * @returns {SpreadsheetApp.Sheet}
  */
 function findSheet(triggerUid) {
-  let sheets = SpreadsheetApp.getActive().getSheets();
+  const sheets = SpreadsheetApp.getActive().getSheets();
   return sheets.find((sheet) => sheet.getName() !== timezonesSheetName &&
     new Schedule(sheet).getTriggerUid() === triggerUid);
 }
@@ -35,8 +35,8 @@ function findSheet(triggerUid) {
  * @param {string} triggerUid
  */
 function deleteTrigger(triggerUid) {
-  let triggers = ScriptApp.getProjectTriggers();
-  let trigger = triggers.find((trigger) => trigger.getUniqueId() === triggerUid);
+  const triggers = ScriptApp.getProjectTriggers();
+  const trigger = triggers.find((trigger) => trigger.getUniqueId() === triggerUid);
   if (trigger) {
       ScriptApp.deleteTrigger(trigger);
   }
@@ -51,13 +51,13 @@ function deleteTrigger(triggerUid) {
 function replaceTrigger(sheet) {
   LockService.getScriptLock().waitLock(60000);
 
-  let schedule = new Schedule(sheet);
+  const schedule = new Schedule(sheet);
 
   deleteTrigger(schedule.getTriggerUid());
 
-  let nextMeeting = schedule.getNextMeeting();
+  const nextMeeting = schedule.getNextMeeting();
   if (nextMeeting) {
-    let trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
+    const trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
       .timeBased()
       .at(nextMeeting)
       .create();
@@ -77,7 +77,7 @@ function replaceTrigger(sheet) {
  * @param {Events.TimeDriven} e
  */
 function onTimeDrivenEvent(e) {
-  let sheet = findSheet(e.triggerUid);
+  const sheet = findSheet(e.triggerUid);
   if (sheet) {
     nextHostMessage(sheet);
     replaceTrigger(sheet);
@@ -95,7 +95,7 @@ function onTimeDrivenEvent(e) {
  */
 function onEditEvent(e) {
   if (e.range.getColumn() > 5) {
-    let sheet = e.range.getSheet();
+    const sheet = e.range.getSheet();
     replaceTrigger(sheet);
   }
 }
@@ -110,8 +110,8 @@ function onEditEvent(e) {
  * @returns {Content.TextOutput}
  */
 function doPost(e) {
-  let payload = JSON.parse(e.parameter.payload);
-  let sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+  const payload = JSON.parse(e.parameter.payload);
+  const sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
 
   switch (payload.actions[0].action_id) {
     case "next-host":

@@ -15,13 +15,13 @@
  * @returns {Host[]}
  */
 function getHosts(sheet) {
-  let rows = sheet.getDataRange().getValues();
+  const rows = sheet.getDataRange().getValues();
 
-  let hosts = [];
+  const hosts = [];
   for (let i = 0; i < rows.length; i++) {
-    let idx = i + 1;
-    let [name, slackId, active, timestamp] = rows[i];
-    let host = {idx, name, slackId, active, timestamp};
+    const idx = i + 1;
+    const [name, slackId, active, timestamp] = rows[i];
+    const host = {idx, name, slackId, active, timestamp};
     if (host.slackId) {
       hosts.push(host);
     }
@@ -52,12 +52,12 @@ function getLastHost(hosts) {
 function nextHosts(sheet) {
   let next, nextAfter;
 
-  let hosts = getHosts(sheet);
-  let last = getLastHost(hosts);
-  let nextIndex = hosts.indexOf(last) + 1;
-  let hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
+  const hosts = getHosts(sheet);
+  const last = getLastHost(hosts);
+  const nextIndex = hosts.indexOf(last) + 1;
+  const hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
 
-  for (let host of hostsCarrousel) {
+  for (const host of hostsCarrousel) {
     if (!next) sheet.getRange(host.idx, 4).setValue(new Date());
 
     if (host.active) {
@@ -80,7 +80,7 @@ function nextHosts(sheet) {
  * @param {SpreadsheetApp.Sheet} sheet
  */
 function skipMeeting(sheet) {
-  let hosts = getHosts(sheet);
-  let last = getLastHost(hosts);
+  const hosts = getHosts(sheet);
+  const last = getLastHost(hosts);
   sheet.getRange(last.idx, 4).clearContent();
 }
