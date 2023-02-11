@@ -8,7 +8,7 @@ const TIMEZONES_SHEET_NAME = "timezones";
  * @param {string} [responseUrl]
  */
 function nextHostMessage(sheet, responseUrl) {
-  const [next, nextAfter] = nextHosts(sheet);
+  const [next, nextAfter] = new Hosts(sheet).getNext();
   if (next) {
     const channelId = sheet.getName();
     new Slack().sendMessage(next, nextAfter, channelId, responseUrl);
@@ -118,7 +118,7 @@ function doPost(e) {
       nextHostMessage(sheet, payload.response_url);
       break;
     case "skip-meeting":
-      skipMeeting(sheet);
+      new Hosts(sheet).skipMeeting();
       new Slack().markMessageSkipped(payload.message, payload.response_url)
       break;
   }

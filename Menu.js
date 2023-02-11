@@ -139,11 +139,10 @@ function reReadMembers() {
 
   if (result === ui.Button.NO) return;
 
-  const hosts = getHosts(sheet);
-
   const slack = new Slack();
-
   const members = slack.getMembers(channelId);
+
+  const hosts = new Hosts(sheet).getAll();
 
   sheet.getRange(1, 1, sheet.getMaxRows(), 4).clear().removeCheckboxes();
 
