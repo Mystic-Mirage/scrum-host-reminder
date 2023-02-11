@@ -1,13 +1,48 @@
-class Slack {
-  /** @private */
-  static url = "https://slack.com/api/"
+/**
+ * Create a plain/markdown message
+ *
+ * @param {Host} next
+ * @param {Host} nextAfter
+ * @param {boolean} [markdown]
+ * @returns {string}
+ */
+function composeText(next, nextAfter, markdown) {
+  const nextName = markdown ? `<@${next.slackId}>` : next.name;
+  const messageLines = [
+    "Hello!",
+    `This is a friendly reminder that ${nextName} is hosting today's stand-up meeting${markdown ? "" : "."}`,
+  ]
+  if (nextAfter) {
+    const nextAfterName = markdown ? `*${nextAfter.name}*` : nextAfter.name;
+    const suffix = nextAfter.name.endsWith("s") ? "" : "s";
+    const footer = `Next time it's ${nextAfterName}'${suffix} turn${next.slackId === nextAfter.slackId ? " again" : ""}`;
+    messageLines.push(markdown ? `_${footer}_` : footer);
+  }
+  return messageLines.join(markdown ? "\n\n": " ");
+}
 
+
+/**
+ * Remove buttons from message blocks
+ *
+ * @param {Object[]} blocks
+ * @param {string} blocks[].type
+ * @returns {Object[]}
+ */
+function removeActions(blocks) {
+  return blocks.filter((block) => block.type !== "actions");
+}
+
+
+class Slack {
   constructor() {
     const props = PropertiesService.getScriptProperties().getProperties();
     /** @private */
     this.appId = props.SLACK_APP_ID;
     /** @private */
     this.token = props.SLACK_TOKEN;
+    /** @private */
+    this.url = "https://slack.com/api/";
   }
 
  /**
@@ -17,7 +52,7 @@ class Slack {
   * @param {string} path
   * @returns {string}
   */
-  static apiUrl(path) {
+  apiUrl(path) {
     return `${this.url}${path}`;
   }
 
@@ -65,7 +100,7 @@ class Slack {
    * @param {{[p: string]: any}} data
    */
   postApi(path, data) {
-    const url = this.constructor.apiUrl(path);
+    const url = this.apiUrl(path);
     this.post(url, data);
   }
 
@@ -91,7 +126,7 @@ class Slack {
    * @returns {Object}
    */
   getApi(path, data) {
-    const url = this.constructor.apiUrl(path) + this.constructor.getParams(data);
+    const url = this.apiUrl(path) + this.constructor.getParams(data);
     const params = this.prepareFetchParams();
 
     const response = UrlFetchApp.fetch(url, params);
@@ -158,7 +193,7 @@ class Slack {
           const data = {
             channel: channelId,
             ts: message.ts,
-            blocks: this.constructor.removeActions(message.blocks),
+            blocks: removeActions(message.blocks),
           }
 
           this.postApi("chat.update", data);
@@ -173,44 +208,6 @@ class Slack {
   }
 
   /**
-   * Create a plain/markdown message
-   *
-   * @private
-   * @param {Host} next
-   * @param {Host} nextAfter
-   * @param {boolean} [markdown]
-   * @returns {string}
-   */
-  static composeText(next, nextAfter, markdown) {
-    const nextName = markdown ? `<@${next.slackId}>` : next.name;
-    const messageLines = [
-      "Hello!",
-      `This is a friendly reminder that ${nextName} is hosting today's stand-up meeting${markdown ? "" : "."}`,
-    ]
-
-    if (nextAfter) {
-      const nextAfterName = markdown ? `*${nextAfter.name}*` : nextAfter.name;
-      const suffix = nextAfter.name.endsWith("s") ? "" : "s";
-      const footer = `Next time it's ${nextAfterName}'${suffix} turn${next.slackId === nextAfter.slackId ? " again" : ""}`;
-      messageLines.push(markdown ? `_${footer}_` : footer);
-    }
-
-    return messageLines.join(markdown ? "\n\n": " ");
-  }
-
-  /**
-   * Remove buttons from message blocks
-   *
-   * @private
-   * @param {Object[]} blocks
-   * @param {string} blocks[].type
-   * @returns {Object[]}
-   */
-  static removeActions(blocks) {
-    return blocks.filter((block) => block.type !== "actions");
-  }
-
-  /**
    * Add `Sipped` mark to a message
    *
    * @param {Object} message
@@ -218,7 +215,7 @@ class Slack {
    * @param {string} responseUrl
    */
   markMessageSkipped(message, responseUrl) {
-    let blocks = this.constructor.removeActions(message.blocks);
+    let blocks = removeActions(message.blocks);
     blocks.push(
       {
         type: "section",
@@ -249,13 +246,13 @@ class Slack {
    */
   sendMessage(next, nextAfter, channelId, responseUrl) {
     const data = {
-      text: this.constructor.composeText(next, nextAfter),
+      text: composeText(next, nextAfter),
       blocks: [
         {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: this.constructor.composeText(next, nextAfter, true),
+            text: composeText(next, nextAfter, true),
           },
         },
         {

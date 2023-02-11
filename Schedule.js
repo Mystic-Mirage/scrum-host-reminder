@@ -1,11 +1,39 @@
-class Schedule {
-  /** @private */
-  static dayMs = 86400000;
-  /** @private */
-  static triggerRow = 1;
-  /** @private */
-  static triggerColumn = 9;
+const dayMs = 86400000;
+const [triggerRow, triggerColumn] = [1, 9];
 
+
+/**
+ * Convert a date to a specified timezone
+ *
+ * @param {Date} date
+ * @param {string} timeZone
+ * @returns {Date}
+ */
+function tzDate(date, timeZone) {
+  const newDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds()));
+
+  const utcDate = new Date(newDate.toLocaleString("en-US", {timeZone: "UTC"}));
+  const tzDate = new Date(newDate.toLocaleString("en-US", {timeZone: timeZone}));
+  const offset = utcDate.getTime() - tzDate.getTime();
+
+  newDate.setTime(newDate.getTime() + offset);
+
+  return newDate;
+}
+
+
+/**
+ * Get current date
+ * Separate method to mock it in tests
+ *
+ * @returns {Date}
+ */
+function getNow() {
+  return new Date();
+}
+
+
+class Schedule {
   /**
    * @param {Spreadsheet.Sheet} sheet
    */
@@ -39,37 +67,6 @@ class Schedule {
   }
 
   /**
-   * Convert a date to a specified timezone
-   *
-   * @private
-   * @param {Date} date
-   * @param {string} timeZone
-   * @returns {Date}
-   */
-  static tzDate(date, timeZone) {
-    const newDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds()));
-
-    const utcDate = new Date(newDate.toLocaleString("en-US", {timeZone: "UTC"}));
-    const tzDate = new Date(newDate.toLocaleString("en-US", {timeZone: timeZone}));
-    const offset = utcDate.getTime() - tzDate.getTime();
-
-    newDate.setTime(newDate.getTime() + offset);
-
-    return newDate;
-  }
-
-  /**
-   * Get current date
-   * Separate method to mock it in tests
-   *
-   * @private
-   * @returns {Date}
-   */
-  static getNow() {
-    return new Date();
-  }
-
-  /**
    * Calculate next meeting date
    *
    * @returns {Date | null}
@@ -78,12 +75,12 @@ class Schedule {
     const scheduleData = this.getScheduleData();
     if (!scheduleData) return null;
 
-    let now = this.constructor.getNow();
+    let now = getNow();
     if (now < scheduleData.startPoint) {
       now = scheduleData.startPoint;
     }
 
-    const startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / this.constructor.dayMs) % scheduleData.schedule.length;
+    const startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / dayMs) % scheduleData.schedule.length;
 
     const scheduleCarousel = [...scheduleData.schedule.slice(startDay), ...scheduleData.schedule.slice(0, startDay)];
     let dayShift = 0;
@@ -91,12 +88,12 @@ class Schedule {
       if (day) {
         const date = new Date(now.getTime() + dayShift);
         date.setHours(scheduleData.timeAt.getHours(), scheduleData.timeAt.getMinutes(), scheduleData.timeAt.getSeconds(), scheduleData.timeAt.getMilliseconds());
-        const dateAt = this.constructor.tzDate(date, scheduleData.timeZone);
+        const dateAt = tzDate(date, scheduleData.timeZone);
 
         if (dateAt > now) return dateAt;
       }
 
-      dayShift += this.constructor.dayMs;
+      dayShift += dayMs;
     }
   }
   /**
@@ -105,7 +102,7 @@ class Schedule {
    * @returns {SpreadsheetApp.Range}
    */
   getTriggerRange() {
-    return /** @type {SpreadsheetApp.Range} */ this.sheet.getRange(this.constructor.triggerRow, this.constructor.triggerColumn);
+    return /** @type {SpreadsheetApp.Range} */ this.sheet.getRange(triggerRow, triggerColumn);
   }
 
   /**
