@@ -16,55 +16,65 @@ function nextHostMessage(sheet, responseUrl) {
 }
 
 
-/**
- * Find sheet by trigger UID stored on it
- *
- * @param {string} triggerUid
- * @returns {SpreadsheetApp.Sheet}
- */
-function findSheet(triggerUid) {
-  const sheets = SpreadsheetApp.getActive().getSheets();
-  return sheets.find((sheet) => sheet.getName() !== TIMEZONES_SHEET_NAME &&
-    new Schedule(sheet).getTriggerUid() === triggerUid);
-}
-
-
-/**
- * Delete specified trigger
- *
- * @param {string} triggerUid
- */
-function deleteTrigger(triggerUid) {
-  const triggers = ScriptApp.getProjectTriggers();
-  const trigger = triggers.find((trigger) => trigger.getUniqueId() === triggerUid);
-  if (trigger) {
-      ScriptApp.deleteTrigger(trigger);
+class Trigger {
+  /**
+   * @param {string} [triggerUid]
+   */
+  constructor(triggerUid = "") {
+    /** @private */
+    this.triggerUid = triggerUid;
   }
-}
 
+  /**
+   * Find sheet by trigger UID stored on it
+   *
+   * @returns {SpreadsheetApp.Sheet}
+   */
+  findSheet() {
+    const sheets = SpreadsheetApp.getActive().getSheets();
+    return sheets.find((sheet) => sheet.getName() !== TIMEZONES_SHEET_NAME &&
+      new Schedule(sheet).getTriggerUid() === this.triggerUid);
+  }
 
-/**
- * Recreate a trigger and store its UID on a sheet named with channel ID
- *
- * @param {SpreadsheetApp.Sheet} sheet
- */
-function replaceTrigger(sheet) {
-  LockService.getScriptLock().waitLock(60000);
+  /**
+   * Delete trigger
+   */
+  delete() {
+    const triggers = ScriptApp.getProjectTriggers();
+    const trigger = triggers.find((trigger) => trigger.getUniqueId() === this.triggerUid);
+    if (trigger) {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  }
 
-  const schedule = new Schedule(sheet);
+  /**
+   * Recreate a trigger and store its UID on a sheet named with channel ID
+   *
+   * @param {SpreadsheetApp.Sheet} sheet
+   */
+  replace(sheet) {
+    LockService.getScriptLock().waitLock(60000);
 
-  deleteTrigger(schedule.getTriggerUid());
+    const schedule = new Schedule(sheet);
+    if (!this.triggerUid) {
+      this.triggerUid = schedule.getTriggerUid();
+    }
 
-  const nextMeeting = schedule.getNextMeeting();
-  if (nextMeeting) {
-    const trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
-      .timeBased()
-      .at(nextMeeting)
-      .create();
+    this.delete();
 
-    schedule.setTriggerUid(trigger.getUniqueId());
-  } else {
-    schedule.deleteTriggerUid();
+    const nextMeeting = schedule.getNextMeeting();
+    if (nextMeeting) {
+      const trigger = ScriptApp.newTrigger(onTimeDrivenEvent.name)
+        .timeBased()
+        .at(nextMeeting)
+        .create();
+
+      this.triggerUid = trigger.getUniqueId()
+      schedule.setTriggerUid(this.triggerUid);
+    } else {
+      this.triggerUid = "";
+      schedule.deleteTriggerUid();
+    }
   }
 }
 
@@ -77,12 +87,13 @@ function replaceTrigger(sheet) {
  * @param {Events.TimeDriven} e
  */
 function onTimeDrivenEvent(e) {
-  const sheet = findSheet(e.triggerUid);
+  const trigger = new Trigger(e.triggerUid);
+  const sheet = trigger.findSheet();
   if (sheet) {
     nextHostMessage(sheet);
-    replaceTrigger(sheet);
+    trigger.replace(sheet);
   } else {
-    deleteTrigger(e.triggerUid);
+    trigger.delete();
   }
 }
 
@@ -96,7 +107,7 @@ function onTimeDrivenEvent(e) {
 function onEditEvent(e) {
   if (e.range.getColumn() > 5) {
     const sheet = e.range.getSheet();
-    replaceTrigger(sheet);
+    new Trigger().replace(sheet);
   }
 }
 
