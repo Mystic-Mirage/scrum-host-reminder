@@ -1,6 +1,8 @@
+const TIMESTAMP_COLUMN = 4;
+
 /**
  * @typedef {Object} Host
- * @property {number} idx
+ * @property {number} row
  * @property {string} name
  * @property {string} slackId
  * @property {boolean} active
@@ -36,15 +38,26 @@ class Hosts {
 
     const hosts = [];
     for (let i = 0; i < rows.length; i++) {
-      const idx = i + 1;
+      const row = i + 1;
       const [name, slackId, active, timestamp] = rows[i];
-      const host = {idx, name, slackId, active, timestamp};
+      const host = {row, name, slackId, active, timestamp};
       if (host.slackId) {
         hosts.push(host);
       }
     }
 
     return hosts;
+  }
+
+  /**
+   * Get range with a timestamp
+   *
+   * @private
+   * @param {Host} host
+   * @returns {SpreadsheetApp.Range}
+   */
+  getTimestampRange(host) {
+    return /** @type {SpreadsheetApp.Range} */ this.sheet.getRange(host.row, TIMESTAMP_COLUMN);
   }
 
   /**
@@ -62,7 +75,7 @@ class Hosts {
     const hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
 
     for (const host of hostsCarrousel) {
-      if (!next) this.sheet.getRange(host.idx, 4).setValue(new Date());
+      if (!next) this.getTimestampRange(host).setValue(new Date());
 
       if (host.active) {
         if (next) {
@@ -83,6 +96,6 @@ class Hosts {
   skipMeeting() {
     const hosts = this.getAll();
     const last = getLastHost(hosts);
-    this.sheet.getRange(last.idx, 4).clearContent();
+    this.getTimestampRange(last).clearContent();
   }
 }
