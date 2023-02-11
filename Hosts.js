@@ -27,27 +27,18 @@ class Hosts {
   constructor(sheet) {
     /** @private */
     this.sheet = sheet;
-  }
+    /** @type {Host[]} */
+    this.all = [];
 
-  /**
-   * Retrieve hosts from a sheet
-   *
-   * @returns {Host[]}
-   */
-  getAll() {
     const rows = this.sheet.getDataRange().getValues();
-
-    const hosts = [];
     for (let i = 0; i < rows.length; i++) {
       const row = i + 1;
       const [name, slackId, active, timestamp] = rows[i];
       const host = {row, name, slackId, active, timestamp};
       if (host.slackId) {
-        hosts.push(host);
+        this.all.push(host);
       }
     }
-
-    return hosts;
   }
 
   /**
@@ -68,10 +59,9 @@ class Hosts {
    * @returns {[Host, Host]}
    */
   getNext() {
-    const hosts = this.getAll();
-    const last = getLastHost(hosts);
-    const nextIndex = hosts.indexOf(last) + 1;
-    const hostsCarrousel = [...hosts.slice(nextIndex), ...hosts.slice(0, nextIndex)];
+    const last = getLastHost(this.all);
+    const nextIndex = this.all.indexOf(last) + 1;
+    const hostsCarrousel = [...this.all.slice(nextIndex), ...this.all.slice(0, nextIndex)];
 
     let next, nextAfter;
     for (const host of hostsCarrousel) {
@@ -94,8 +84,7 @@ class Hosts {
    * Remove date from last host so it will be re-elected as next host again
    */
   skipMeeting() {
-    const hosts = this.getAll();
-    const last = getLastHost(hosts);
+    const last = getLastHost(this.all);
     this.getTimestampRange(last).clearContent();
   }
 }

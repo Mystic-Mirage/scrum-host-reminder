@@ -142,7 +142,7 @@ function reReadMembers() {
   const slack = new Slack();
   const members = slack.getMembers(channelId);
 
-  const hosts = new Hosts(sheet).getAll();
+  const hosts = new Hosts(sheet).all;
 
   sheet.getRange(1, 1, sheet.getMaxRows(), 4).clear().removeCheckboxes();
 
