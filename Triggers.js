@@ -1,4 +1,4 @@
-const TIMEZONES_SHEET_NAME = "timezones";
+const timezonesSheetName = "timezones";
 
 
 /**
@@ -24,7 +24,7 @@ function nextHostMessage(sheet, responseUrl) {
  */
 function findSheet(triggerUid) {
   let sheets = SpreadsheetApp.getActive().getSheets();
-  return sheets.find((sheet) => sheet.getName() !== TIMEZONES_SHEET_NAME &&
+  return sheets.find((sheet) => sheet.getName() !== timezonesSheetName &&
     new Schedule(sheet).getTriggerUid() === triggerUid);
 }
 
