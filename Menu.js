@@ -45,7 +45,7 @@ function newSheet(channelId) {
     .build();
   dateTimeRange.setDataValidation(dateTimeValidation);
 
-  const tzRangeSource = spreadsheet.getRange(`${timezonesSheetName}!A:A`);
+  const tzRangeSource = spreadsheet.getRange(`${TIMEZONES_SHEET_NAME}!A:A`);
   const tzValidation = SpreadsheetApp.newDataValidation()
     .requireValueInRange(tzRangeSource, false)
     .setAllowInvalid(false)
@@ -130,8 +130,8 @@ function reReadMembers() {
   const sheetName = sheet.getName();
   const channelId = sheetName;
 
-  if (sheetName === timezonesSheetName) {
-    ui.alert(`You cannot do this with "${timezonesSheetName}"!`);
+  if (sheetName === TIMEZONES_SHEET_NAME) {
+    ui.alert(`You cannot do this with "${TIMEZONES_SHEET_NAME}"!`);
     return;
   }
 
@@ -178,8 +178,8 @@ function deleteSheet() {
   const sheet = spreadsheet.getActiveSheet();
   const sheetName = sheet.getName();
 
-  if (sheetName === timezonesSheetName) {
-    ui.alert(`You cannot delete "${timezonesSheetName}"!`);
+  if (sheetName === TIMEZONES_SHEET_NAME) {
+    ui.alert(`You cannot delete "${TIMEZONES_SHEET_NAME}"!`);
     return;
   }
 
