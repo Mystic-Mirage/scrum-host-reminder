@@ -25,7 +25,7 @@ describe(tzDate.name, function () {
  * @param {string} startPoint
  * @param {string} now
  * @param {string} expected
- * @returns {{desc: string, scheduleData: Object, now: Date, expected: date}}
+ * @returns {{desc: string, scheduleData: Object, now: Date, expected: Date}}
  */
 function getNextMeetingParam(desc, startPoint, now, expected) {
     return {
