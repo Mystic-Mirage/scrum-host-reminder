@@ -191,7 +191,7 @@ function deleteSheet() {
   if (sheetName !== channelId) return;
 
   const schedule = new Schedule(sheet);
-  deleteTrigger(schedule.getTriggerUid());
+  new Trigger(schedule.getTriggerUid()).delete();
   schedule.deleteTriggerUid();
 
   spreadsheet.deleteSheet(sheet);
