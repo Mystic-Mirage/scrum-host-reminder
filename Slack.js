@@ -160,15 +160,28 @@ class Slack {
    * @param {string} [nextCursor]
    * @returns {Object}
    */
-  readHistory(channelId, nextCursor) {
-    const data = {
-      channel: channelId,
-    };
-    if (nextCursor) {
-      data.cursor = nextCursor;
-    }
+  *readHistory(channelId) {
+    let nextCursor;
+    for (let repeat = 0; repeat < 10; repeat++) {
+      const data = {
+        channel: channelId,
+      };
+      if (nextCursor) {
+        data.cursor = nextCursor;
+      }
 
-    return this.getApi("conversations.history", data);
+      const history = this.getApi("conversations.history", data);
+
+      if (!history.messages) break;
+
+      for (const message of history.messages) {
+        yield message;
+      }
+
+      if (!history.has_more) break;
+
+      nextCursor = history.response_metadata.next_cursor;
+    }
   }
 
   /**
@@ -199,28 +212,17 @@ class Slack {
    * @param {string} channelId
    */
   disarmLastMessage(channelId) {
-    let nextCursor = "";
-    for (let repeat = 0; repeat < 10; repeat++) {
-      const history = this.readHistory(channelId, nextCursor);
+    for (const message of this.readHistory(channelId)) {
+      if (message.app_id === this.appId) {
+        const data = {
+          channel: channelId,
+          ts: message.ts,
+          blocks: removeActions(message.blocks),
+        };
 
-      if (!history.messages) return;
-
-      for (const message of history.messages) {
-        if (message.app_id === this.appId) {
-          const data = {
-            channel: channelId,
-            ts: message.ts,
-            blocks: removeActions(message.blocks),
-          }
-
-          this.postApi("chat.update", data);
-          return;
-        }
+        this.postApi("chat.update", data);
+        break;
       }
-
-      if (!history.has_more) break;
-
-      nextCursor = history.response_metadata.next_cursor;
     }
   }
 
@@ -386,4 +388,16 @@ function debugGetUserInfo() {
   const userId = sheet.getRange(1, 2).getValue();
   const slack = new Slack();
   console.log(slack.getUserInfo(userId));
+}
+
+function debugReadHistory() {
+  const sheet = SpreadsheetApp.getActive().getSheets()[1];
+  const channelId = sheet.getName();
+  const slack = new Slack();
+  let count = 0;
+  for (const message of slack.readHistory(channelId)) {
+    console.log(message.ts, message.text);
+    count += 1;
+  }
+  console.log(count);
 }
