@@ -150,7 +150,7 @@ function reReadMembers() {
 
   const hosts = new Hosts(sheet).all;
 
-  sheet.getRange(1, 1, sheet.getMaxRows(), 4).clear().removeCheckboxes();
+  sheet.getRange(1, 1, sheet.getMaxRows(), 4).clearContent().removeCheckboxes();
 
   let rowIndex = 0;
   for (const userId of members) {
