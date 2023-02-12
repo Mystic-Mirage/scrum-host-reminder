@@ -17,6 +17,9 @@ const TIMESTAMP_COLUMN = 4;
  */
 getLastHost = (hosts) => hosts.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
 
+/**
+ * Host list processor
+ */
 class Hosts {
   /**
    * @param {SpreadsheetApp.Sheet} sheet

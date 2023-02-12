@@ -32,6 +32,9 @@ function removeActions(blocks) {
   return blocks.filter((block) => block.type !== "actions");
 }
 
+/**
+ * Working with Slack API
+ */
 class Slack {
   constructor() {
     const props = PropertiesService.getScriptProperties().getProperties();

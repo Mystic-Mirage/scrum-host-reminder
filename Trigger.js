@@ -1,5 +1,8 @@
 const TIMEZONES_SHEET_NAME = "timezones";
 
+/**
+ * Wrapper for Google Apps Script triggers
+ */
 class Trigger {
   /**
    * @param {string} [triggerUid]

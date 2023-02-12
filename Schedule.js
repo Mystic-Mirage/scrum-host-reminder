@@ -30,6 +30,9 @@ function getNow() {
   return new Date();
 }
 
+/**
+ * Schedule data processor
+ */
 class Schedule {
   /**
    * @param {SpreadsheetApp.Sheet} sheet
