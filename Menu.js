@@ -28,9 +28,16 @@ function newSheet(channelId) {
 
   sheet.setColumnWidth(1, 200);
   sheet.setColumnWidth(4, 150);
-  sheet.getRange(1, 4, sheet.getMaxRows()).setNumberFormat("yyyy-mm-dd hh:mm:ss")
-  sheet.setColumnWidth(5, 20);
 
+  const timestampRange = sheet.getRange(1, 4, sheet.getMaxRows());
+  timestampRange.setNumberFormat("yyyy-mm-dd hh:mm:ss");
+  const timestampFormatting = SpreadsheetApp.newConditionalFormatRule()
+    .whenFormulaSatisfied("=D:D=MAX(FILTER(D:D,C:C))")
+    .setBackground("#b7e1cd")
+    .setRanges([timestampRange])
+    .build();
+
+  sheet.setColumnWidth(5, 20);
   sheet.getRange(1, 5, sheet.getMaxRows()).setBackground("#efefef");
 
   const startOfWeek = getStartOfWeek();
@@ -56,7 +63,8 @@ function newSheet(channelId) {
     .setBackground("#f4cccc")
     .setRanges([sheet.getRange(1, 6, 1, 3)])
     .build();
-  sheet.setConditionalFormatRules([scheduleDataFormatting]);
+
+  sheet.setConditionalFormatRules([timestampFormatting, scheduleDataFormatting]);
 
   sheet.getRange(1, 6, 1, 4).setNotes(
     [
