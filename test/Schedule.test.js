@@ -26,7 +26,7 @@ function getNextMeetingParam(desc, startPoint, now, expected) {
     },
     now: new Date(now),
     expected: new Date(expected),
-  }
+  };
 }
 
 describe("Schedule", () => {
