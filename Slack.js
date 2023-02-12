@@ -2,23 +2,39 @@
  * Create a plain/markdown message
  *
  * @param {Host} next
- * @param {Host} nextAfter
- * @param {boolean} [markdown]
+ * @param {Host | undefined} nextAfter
+ * @param {boolean} [markdown=false]
  * @returns {string}
  */
-function composeText(next, nextAfter, markdown) {
-  const nextName = markdown ? `<@${next.slackId}>` : next.name;
+function composeText(next, nextAfter, markdown= false) {
+  if (!nextAfter) {
+    nextAfter = next;
+  }
+
+  let nextName, nextAfterName, period, separator;
+  if (markdown) {
+    nextName = `<@${next.slackId}>`;
+    nextAfterName = `*${nextAfter.name}*`;
+    period = "";
+    separator = "\n\n";
+  } else {
+    nextName = next.name;
+    nextAfterName = nextAfter.name;
+    period = ".";
+    separator = " ";
+  }
+
+  const possessiveMarker = nextAfter.name.endsWith("s") ? "'" : "'s";
+  const adverb = next.slackId === nextAfter.slackId ? " again" : ""
+  const footer = `Next time it's ${nextAfterName}${possessiveMarker} turn${adverb}`;
+
   const messageLines = [
     "Hello!",
-    `This is a friendly reminder that ${nextName} is hosting today's stand-up meeting${markdown ? "" : "."}`,
+    `This is a friendly reminder that ${nextName} is hosting today's stand-up meeting${period}`,
+    markdown ? `_${footer}_` : footer,
   ]
-  if (nextAfter) {
-    const nextAfterName = markdown ? `*${nextAfter.name}*` : nextAfter.name;
-    const suffix = nextAfter.name.endsWith("s") ? "" : "s";
-    const footer = `Next time it's ${nextAfterName}'${suffix} turn${next.slackId === nextAfter.slackId ? " again" : ""}`;
-    messageLines.push(markdown ? `_${footer}_` : footer);
-  }
-  return messageLines.join(markdown ? "\n\n": " ");
+
+  return messageLines.join(separator);
 }
 
 /**
