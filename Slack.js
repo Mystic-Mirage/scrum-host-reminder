@@ -157,7 +157,6 @@ class Slack {
    *
    * @private
    * @param {string} channelId
-   * @param {string} [nextCursor]
    * @returns {Object}
    */
   *readHistory(channelId) {
