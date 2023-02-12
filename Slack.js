@@ -161,15 +161,12 @@ class Slack {
    * @returns {Object}
    */
   *readHistory(channelId) {
-    let nextCursor;
+    let nextCursor = "";
     for (let repeat = 0; repeat < 10; repeat++) {
       const data = {
         channel: channelId,
+        cursor: nextCursor,
       };
-      if (nextCursor) {
-        data.cursor = nextCursor;
-      }
-
       const history = this.getApi("conversations.history", data);
 
       if (!history.messages) break;
