@@ -69,7 +69,7 @@ function newSheet(channelId) {
     ]
   );
 
-  new Schedule(sheet).getTriggerRange().protect().setWarningOnly(true);
+  new Schedule(sheet).triggerRange.protect().setWarningOnly(true);
 
   sheet.getRange(2, 6, 2, 7)
     .insertCheckboxes()

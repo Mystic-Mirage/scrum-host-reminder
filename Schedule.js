@@ -37,6 +37,7 @@ class Schedule {
   constructor(sheet) {
     /** @private */
     this.sheet = sheet;
+    this.triggerRange = sheet && this.sheet.getRange(triggerRow, triggerColumn);
   }
 
   /**
@@ -93,14 +94,6 @@ class Schedule {
       dayShift += dayMs;
     }
   }
-  /**
-   * Return a range where trigger UID is stored
-   *
-   * @returns {SpreadsheetApp.Range}
-   */
-  getTriggerRange() {
-    return /** @type {SpreadsheetApp.Range} */ this.sheet.getRange(triggerRow, triggerColumn);
-  }
 
   /**
    * Retrieve trigger UID from a sheet
@@ -108,7 +101,7 @@ class Schedule {
    * @returns {string}
    */
   getTriggerUid() {
-    return this.getTriggerRange().getValue().toString();
+    return this.triggerRange.getValue().toString();
   }
 
   /**
@@ -117,14 +110,14 @@ class Schedule {
    * @param {string} triggerUid
    */
   setTriggerUid(triggerUid) {
-    this.getTriggerRange().setValue(triggerUid);
+    this.triggerRange.setValue(triggerUid);
   }
 
   /**
    * Delete trigger UID from a sheet
    */
   deleteTriggerUid() {
-    this.getTriggerRange().clearContent();
+    this.triggerRange.clearContent();
   }
 }
 
