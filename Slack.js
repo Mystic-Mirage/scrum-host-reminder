@@ -21,7 +21,6 @@ function composeText(next, nextAfter, markdown) {
   return messageLines.join(markdown ? "\n\n": " ");
 }
 
-
 /**
  * Remove buttons from message blocks
  *
@@ -32,7 +31,6 @@ function composeText(next, nextAfter, markdown) {
 function removeActions(blocks) {
   return blocks.filter((block) => block.type !== "actions");
 }
-
 
 class Slack {
   constructor() {
@@ -358,13 +356,11 @@ class Slack {
 
 }
 
-
 function debugGetMembers() {
   const sheet = SpreadsheetApp.getActive().getSheets()[1];
   const slack = new Slack();
   console.log(slack.getMembers(sheet.getName()));
 }
-
 
 function debugGetUserInfo() {
   const sheet = SpreadsheetApp.getActive().getSheets()[1];

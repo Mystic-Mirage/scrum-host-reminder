@@ -1,7 +1,6 @@
 const dayMs = 86400000;
 const [triggerRow, triggerColumn] = [1, 9];
 
-
 /**
  * Convert a date to a specified timezone
  *
@@ -21,7 +20,6 @@ function tzDate(date, timeZone) {
   return newDate;
 }
 
-
 /**
  * Get current date
  * Separate method to mock it in tests
@@ -31,7 +29,6 @@ function tzDate(date, timeZone) {
 function getNow() {
   return new Date();
 }
-
 
 class Schedule {
   /**
@@ -130,7 +127,6 @@ class Schedule {
     this.getTriggerRange().clearContent();
   }
 }
-
 
 function debugGetNextMeeting() {
   const sheet = SpreadsheetApp.getActive().getSheets()[1];

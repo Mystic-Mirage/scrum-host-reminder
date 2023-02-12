@@ -1,6 +1,5 @@
 const TIMESTAMP_COLUMN = 4;
 
-
 /**
  * @typedef {Object} Host
  * @property {number} row
@@ -10,7 +9,6 @@ const TIMESTAMP_COLUMN = 4;
  * @property {Date} timestamp
  */
 
-
 /**
  * Find recent host
  *
@@ -18,7 +16,6 @@ const TIMESTAMP_COLUMN = 4;
  * @returns {Host}
  */
 getLastHost = (hosts) => hosts.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
-
 
 class Hosts {
   /**

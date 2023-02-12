@@ -13,7 +13,6 @@ function getStartOfWeek() {
   return date;
 }
 
-
 /**
  * Create, fill and format a new sheet
  *
@@ -120,7 +119,6 @@ function addChannel() {
   slack.joinChannel(channelId);
 }
 
-
 /**
  * Re-read member list menu item handler
  */
@@ -165,7 +163,6 @@ function reReadMembers() {
 
   sheet.getRange(1, 1, sheet.getMaxRows(), 4).sort(1);
 }
-
 
 /**
  * Delete sheet menu item handler

@@ -8,7 +8,6 @@ const ScheduleModule = rewire("../Schedule.js");
 const Schedule = ScheduleModule.__get__("Schedule");
 const tzDate = ScheduleModule.__get__("tzDate");
 
-
 describe(tzDate.name, function () {
   it("should be 01:00 (UTC) when 03:00 (Kyiv) in Winter", function () {
     assert.deepStrictEqual(tzDate(new Date("2023-02-06 03:00"), "Europe/Kiev"), new Date("2023-02-06 01:00+00:00"));
@@ -18,7 +17,6 @@ describe(tzDate.name, function () {
     assert.deepStrictEqual(tzDate(new Date("2023-07-17 03:00"), "Europe/Kiev"), new Date("2023-07-17 00:00+00:00"));
   });
 });
-
 
 /**
  * @param {string} desc
@@ -40,7 +38,6 @@ function getNextMeetingParam(desc, startPoint, now, expected) {
     expected: new Date(expected),
   }
 }
-
 
 let getNextMeetingParams = [
   getNextMeetingParam(
@@ -98,7 +95,6 @@ let getNextMeetingParams = [
     "2023-02-13 11:00+02:00",
   ),
 ]
-
 
 describe(Schedule.prototype.getNextMeeting.name, function () {
   itParam("${value.desc}", getNextMeetingParams, function (value) {

@@ -1,6 +1,5 @@
 const TIMEZONES_SHEET_NAME = "timezones";
 
-
 class Trigger {
   /**
    * @param {string} [triggerUid]
@@ -62,5 +61,3 @@ class Trigger {
     }
   }
 }
-
-
