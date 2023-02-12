@@ -1,5 +1,5 @@
-const dayMs = 86400000;
-const [triggerRow, triggerColumn] = [1, 9];
+const DAY_MS = 86400000;
+const [TRIGGER_ROW, TRIGGER_COLUMN] = [1, 9];
 
 /**
  * Convert a date to a specified timezone
@@ -40,7 +40,7 @@ class Schedule {
   constructor(sheet) {
     /** @private */
     this.sheet = sheet;
-    this.triggerRange = this.sheet.getRange(triggerRow, triggerColumn);
+    this.triggerRange = this.sheet.getRange(TRIGGER_ROW, TRIGGER_COLUMN);
   }
 
   /**
@@ -81,7 +81,7 @@ class Schedule {
       now = scheduleData.startPoint;
     }
 
-    const startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / dayMs) % scheduleData.schedule.length;
+    const startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
 
     const scheduleCarousel = [...scheduleData.schedule.slice(startDay), ...scheduleData.schedule.slice(0, startDay)];
     let dayShift = 0;
@@ -94,7 +94,7 @@ class Schedule {
         if (dateAt > now) return dateAt;
       }
 
-      dayShift += dayMs;
+      dayShift += DAY_MS;
     }
   }
 
