@@ -62,7 +62,9 @@ class Hosts {
 
     let next, nextAfter;
     for (const host of hostsCarrousel) {
-      if (!next) this.getTimestampRange(host).setValue(new Date());
+      if (!next) {
+        this.getTimestampRange(host).setValue(new Date());
+      }
 
       if (host.active) {
         if (next) {
@@ -74,6 +76,7 @@ class Hosts {
       }
     }
 
+    SpreadsheetApp.flush();
     return [next, nextAfter];
   }
 
@@ -83,5 +86,6 @@ class Hosts {
   skipMeeting() {
     const last = getLastHost(this.all);
     this.getTimestampRange(last).clearContent();
+    SpreadsheetApp.flush();
   }
 }

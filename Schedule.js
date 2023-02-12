@@ -111,6 +111,7 @@ class Schedule {
    */
   setTriggerUid(triggerUid) {
     this.triggerRange.setValue(triggerUid);
+    SpreadsheetApp.flush();
   }
 
   /**
@@ -118,6 +119,7 @@ class Schedule {
    */
   deleteTriggerUid() {
     this.triggerRange.clearContent();
+    SpreadsheetApp.flush();
   }
 }
 
