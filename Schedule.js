@@ -32,7 +32,7 @@ function getNow() {
 
 class Schedule {
   /**
-   * @param {Spreadsheet.Sheet} sheet
+   * @param {SpreadsheetApp.Sheet} sheet
    */
   constructor(sheet) {
     /** @private */
