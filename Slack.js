@@ -40,8 +40,7 @@ function composeText(next, nextAfter, markdown= false) {
 /**
  * Remove buttons from message blocks
  *
- * @param {Object[]} blocks
- * @param {string} blocks[].type
+ * @param {{type: "actions" | string}[]} blocks
  * @returns {Object[]}
  */
 function removeActions(blocks) {
@@ -166,6 +165,7 @@ class Slack {
         channel: channelId,
         cursor: nextCursor,
       };
+      /** @type {{has_more: boolean, messages: {app_id: string, blocks: Object[], text: string, ts: string}[], response_metadata?: {next_cursor: string}}} */
       const history = this.getApi("conversations.history", data);
 
       if (!history.messages) break;
