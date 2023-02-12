@@ -56,7 +56,7 @@ class Trigger {
         .at(nextMeeting)
         .create();
 
-      this.triggerUid = trigger.getUniqueId()
+      this.triggerUid = trigger.getUniqueId();
       schedule.setTriggerUid(this.triggerUid);
     } else {
       this.triggerUid = "";

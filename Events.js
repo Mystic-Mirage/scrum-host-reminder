@@ -62,7 +62,7 @@ function doPost(e) {
       break;
     case "skip-meeting":
       new Hosts(sheet).skipMeeting();
-      new Slack().markMessageSkipped(payload.message, payload.response_url)
+      new Slack().markMessageSkipped(payload.message, payload.response_url);
       break;
   }
 
