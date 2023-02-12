@@ -40,7 +40,7 @@ class Schedule {
   constructor(sheet) {
     /** @private */
     this.sheet = sheet;
-    this.triggerRange = sheet && this.sheet.getRange(triggerRow, triggerColumn);
+    this.triggerRange = this.sheet.getRange(triggerRow, triggerColumn);
   }
 
   /**
