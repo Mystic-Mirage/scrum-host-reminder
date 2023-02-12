@@ -82,8 +82,8 @@ class Schedule {
     }
 
     const startDay = Math.floor((now.getTime() - scheduleData.startPoint.getTime()) / DAY_MS) % scheduleData.schedule.length;
-
     const scheduleCarousel = [...scheduleData.schedule.slice(startDay), ...scheduleData.schedule.slice(0, startDay)];
+
     let dayShift = 0;
     for (const day of scheduleCarousel) {
       if (day) {

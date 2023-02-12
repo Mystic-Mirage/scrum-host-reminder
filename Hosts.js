@@ -61,10 +61,10 @@ class Hosts {
   getNext() {
     const last = getLastHost(this.all);
     const nextIndex = this.all.indexOf(last) + 1;
-    const hostsCarrousel = [...this.all.slice(nextIndex), ...this.all.slice(0, nextIndex)];
+    const hostsCarousel = [...this.all.slice(nextIndex), ...this.all.slice(0, nextIndex)];
 
     let next, nextAfter;
-    for (const host of hostsCarrousel) {
+    for (const host of hostsCarousel) {
       if (!next) {
         this.getTimestampRange(host).setValue(new Date());
       }
