@@ -4,7 +4,7 @@ const itParam = require("mocha-param");
 const rewire = require("rewire");
 
 const ScheduleModule = rewire("../Schedule.js");
-/** @type {Class<Schedule>} */
+/** @type {Class<Schedule> & typeof Schedule} */
 const Schedule = ScheduleModule.__get__("Schedule");
 const tzDate = ScheduleModule.__get__("tzDate");
 
