@@ -20,11 +20,8 @@ function getStartOfWeek() {
  */
 function newSheet(channelId) {
   const spreadsheet = SpreadsheetApp.getActive();
-  const sheet = spreadsheet.insertSheet();
+  const sheet = spreadsheet.insertSheet(channelId, spreadsheet.getNumSheets());
   sheet.protect().setDomainEdit(false);
-  const totalSheets = spreadsheet.getNumSheets();
-  spreadsheet.moveActiveSheet(totalSheets);
-  sheet.setName(channelId);
 
   sheet.setColumnWidth(1, 200);
   sheet.setColumnWidth(4, 150);
