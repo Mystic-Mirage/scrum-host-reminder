@@ -124,6 +124,36 @@ class Schedule {
     this.triggerRange.clearContent();
     SpreadsheetApp.flush();
   }
+
+  addWeek() {
+    /** @type {SpreadsheetApp.Range} */
+    let prev;
+    for (let i = 2; i < this.sheet.getMaxRows(); i++) {
+      const range = this.sheet.getRange(i, 6, 1, this.sheet.getMaxColumns());
+      if (range.getValue() === "") {
+        if (prev.getRow()) {
+          prev.copyTo(range);
+        }
+        break;
+      }
+      prev = range;
+    }
+  }
+
+  removeWeek() {
+    /** @type {SpreadsheetApp.Range} */
+    let prev;
+    for (let i = 3; i < this.sheet.getMaxRows(); i++) {
+      const range = this.sheet.getRange(i, 6, 1, this.sheet.getMaxColumns());
+      if (range.getValue() === "") {
+        if (prev) {
+          prev.clearContent().removeCheckboxes();
+        }
+        break;
+      }
+      prev = range;
+    }
+  }
 }
 
 function debugGetNextMeeting() {
@@ -131,4 +161,14 @@ function debugGetNextMeeting() {
   const schedule = new Schedule(sheet);
   const nextMeeting = schedule.getNextMeeting();
   console.log(nextMeeting);
+}
+
+function debugAddWeek() {
+  const sheet = SpreadsheetApp.getActive().getSheets()[1];
+  new Schedule(sheet).addWeek();
+}
+
+function debugRemoveWeek() {
+  const sheet = SpreadsheetApp.getActive().getSheets()[1];
+  new Schedule(sheet).removeWeek();
 }
