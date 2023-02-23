@@ -54,6 +54,7 @@ function onEditEvent(e) {
 function doPost(e) {
   /** @type {{actions: {action_id: "next-host" | "skip-meeting"}[], channel: {id: string}, message: Object, response_url: string}} */
   const payload = JSON.parse(e.parameter.payload);
+  console.log(payload);
   const sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
 
   switch (payload.actions[0].action_id) {
