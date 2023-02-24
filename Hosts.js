@@ -91,4 +91,18 @@ class Hosts {
     this.getTimestampRange(last).clearContent();
     SpreadsheetApp.flush();
   }
+
+  /**
+   * Toggle host activity
+   *
+   * @param {string} slackId
+   */
+  toggle(slackId) {
+    for (const host of this.all) {
+      if (host.slackId === slackId) {
+        host.active = !host.active
+        this.sheet.getRange(host.row, 3).setValue(host.active);
+      }
+    }
+  }
 }

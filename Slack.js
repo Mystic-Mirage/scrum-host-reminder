@@ -371,6 +371,85 @@ class Slack {
     return result.ok;
   }
 
+  /**
+   * Respond to a message by replacing it
+   *
+   * @param {string} responseUrl
+   * @param {Object} data
+   */
+  responseMessage(responseUrl, data) {
+    data.replace_original = true;
+    this.post(responseUrl, data);
+  }
+  
+  /**
+   * Delete a message
+   *
+   * @param {string} responseUrl
+   */
+  deleteMessage(responseUrl) {
+    this.post(responseUrl, {delete_original: true});
+  }
+
+  /**
+   * Compose a hosts settings message
+   *
+   * @param {Host[]} hosts
+   * @returns {Object}
+   */
+  static settingsHosts(hosts) {
+    const data = {
+      text: "Hosts",
+      blocks: [
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "*Hosts*",
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Close ❎",
+            },
+            action_id: "close-settings",
+          },
+        },
+      ],
+    };
+
+    for (const host of hosts) {
+      let row = {
+        type: "section",
+        text: {
+          type: "plain_text",
+          text: host.name,
+        },
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: host.active ? "✅" : "❌",
+          },
+          value: host.slackId,
+          action_id: "toggle-host",
+        },
+      };
+      data.blocks.push(row);
+    }
+
+    data.blocks.push(
+      {
+        type: "divider",
+      }
+    );
+
+    return data;
+  }
 }
 
 function debugGetMembers() {
