@@ -559,8 +559,8 @@ class Slack {
         {
           type: "section",
           text: {
-            type: "plain_text",
-            text: `Week ${scheduleData.weeks.length > 1 ? String(i + 1) : ""}`
+            type: "mrkdwn",
+            text: `*Week ${scheduleData.weeks.length > 1 ? String(i + 1) : ""}*`
           },
           accessory: accessory,
         },
@@ -627,23 +627,18 @@ class Slack {
         {
           type: "section",
           text: {
-            type: "plain_text",
-            text: "Start point"
+            type: "mrkdwn",
+            text: "*Start point* _(the beginning of the schedule cycle)_"
           },
-        },
-        {
-          type: "actions",
-          elements: [
-            {
-              type: "datepicker",
-              initial_date: initialStartPoint,
-              placeholder: {
-                type: "plain_text",
-                text: "Start point",
-              },
-              action_id: "set-start-point"
+          accessory: {
+            type: "datepicker",
+            initial_date: initialStartPoint,
+            placeholder: {
+              type: "plain_text",
+              text: "Start point",
             },
-          ],
+            action_id: "set-start-point"
+          },
         },
         ...weeks,
         {
