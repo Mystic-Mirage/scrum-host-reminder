@@ -184,6 +184,31 @@ function doPost(e) {
           break;
       }
     }
+  } else if (e.postData.contents) {
+    /** @type {{type: "url_verification" | "event_callback", challenge?: string,
+     * api_app_id: string, event?: {type: "member_joined_channel" | "member_left_channel", channel: string, inviter?: string}}} */
+    const contents = JSON.parse(e.postData.contents);
+    console.log(contents);
+
+    switch (contents.type) {
+      case "url_verification":
+        return ContentService.createTextOutput(contents.challenge);
+      case "event_callback":
+        const props = PropertiesService.getScriptProperties().getProperties();
+        if (contents.api_app_id === props.SLACK_APP_ID) {
+          switch (contents.event.type) {
+            case "member_joined_channel":
+              newSheet(contents.event.channel);
+              break;
+            case "member_left_channel":
+              const sheet = SpreadsheetApp.getActive().getSheetByName(contents.event.channel);
+              deleteSheet(sheet);
+              break;
+          }
+        }
+    }
+  } else {
+    console.log(e);
   }
 
   return ContentService.createTextOutput("");
@@ -199,6 +224,6 @@ function onOpen() {
     .addSeparator()
     .addItem("Re-read the channel members", reReadMembers.name)
     .addSeparator()
-    .addItem("Delete current channel", deleteSheet.name)
+    .addItem("Delete current channel", deleteChannel.name)
     .addToUi();
 }

@@ -67,8 +67,8 @@ function newSheet(channelId) {
     [
       [
         "Start point\n\nThe starting date of the schedule",
-        "Meeting time",
-        "Meeting timezone",
+        "Reminder time",
+        "Reminder timezone",
         "!!! DO NOT REMOVE !!!\n\nStored trigger UID"
       ]
     ]
@@ -180,11 +180,10 @@ function refreshHosts(sheet) {
 /**
  * Delete sheet menu item handler
  */
-function deleteSheet() {
+function deleteChannel() {
   const ui = SpreadsheetApp.getUi();
 
-  const spreadsheet = SpreadsheetApp.getActive();
-  const sheet = spreadsheet.getActiveSheet();
+  const sheet = SpreadsheetApp.getActive().getActiveSheet();
   const sheetName = sheet.getName();
 
   if (sheetName === TIMEZONES_SHEET_NAME) {
@@ -195,18 +194,27 @@ function deleteSheet() {
   const result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);
   if (result === ui.Button.NO) return;
 
-  const channelId = ui.prompt("Confirm by entering channel ID", ).getResponseText();
+  const channelId = ui.prompt("Confirm by entering channel ID").getResponseText();
   if (!channelId) return;
 
   if (sheetName !== channelId) return;
 
+  deleteSheet(sheet);
+
+  const slack = new Slack();
+  slack.leaveChannel(channelId);
+  slack.disarmLastMessage(channelId);
+}
+
+/**
+ * Delete sheet
+ *
+ * @param {SpreadsheetApp.Sheet} sheet
+ */
+function deleteSheet(sheet) {
   const schedule = new Schedule(sheet);
   new Trigger(schedule.getTriggerUid()).delete();
   schedule.deleteTriggerUid();
 
-  spreadsheet.deleteSheet(sheet);
-
-  const slack = new Slack();
-  slack.disarmLastMessage(channelId);
-  slack.leaveChannel(channelId);
+  SpreadsheetApp.getActive().deleteSheet(sheet);
 }
