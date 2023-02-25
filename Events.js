@@ -84,33 +84,36 @@ function doPost(e) {
     const payload = JSON.parse(e.parameter.payload);
     console.log(payload);
 
-    let sheet;
+    for (const action of payload.actions) {
+      let sheet, message;
 
-    switch (payload.actions[0].action_id) {
-      case "next-host":
-        sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-        nextHostMessage(sheet, payload.response_url);
-        break;
-      case "skip-meeting":
-        sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-        new Hosts(sheet).skipMeeting();
-        new Slack().markMessageSkipped(payload.message, payload.response_url);
-        break;
-      case "toggle-host":
-        sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-        const hosts = new Hosts(sheet);
-        hosts.toggle(payload.actions[0].value);
-        const message = Slack.settingsHosts(hosts.all);
-        new Slack().responseMessage(payload.response_url, message)
-        break;
-      case "refresh-hosts":
-        sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-        refreshHosts(sheet);
-        new Slack().responseMessage(payload.response_url, Slack.settingsHosts(new Hosts(sheet).all))
-        break;
-      case "close-settings":
-        new Slack().deleteMessage(payload.response_url);
-        break;
+      switch (action.action_id) {
+        case "next-host":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          nextHostMessage(sheet, payload.response_url);
+          break;
+        case "skip-meeting":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          new Hosts(sheet).skipMeeting();
+          new Slack().markMessageSkipped(payload.message, payload.response_url);
+          break;
+        case "toggle-host":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          const hosts = new Hosts(sheet);
+          hosts.toggle(action.value);
+          message = Slack.settingsHosts(hosts.all);
+          new Slack().responseMessage(payload.response_url, message)
+          break;
+        case "refresh-hosts":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          refreshHosts(sheet);
+          message = Slack.settingsHosts(new Hosts(sheet).all);
+          new Slack().responseMessage(payload.response_url, message);
+          break;
+        case "close-settings":
+          new Slack().deleteMessage(payload.response_url);
+          break;
+      }
     }
   }
 
