@@ -78,7 +78,7 @@ function doPost(e) {
     }
   } else if (e.parameter.payload) {
     /** @type {{
-     * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" | "set-time" | "set-timezone" | "close-settings",
+     * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" | "set-time" | "clear-time" | "set-timezone" | "close-settings",
      * value?: string, selected_time?: string, selected_option?: {value: string}}[],
      * channel: {id: string}, message: Object, response_url: string
      * }} */
@@ -114,6 +114,16 @@ function doPost(e) {
         case "set-time":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           Schedule.setTime(sheet, action.selected_time);
+          scheduleData = new Schedule(sheet).getScheduleData(true);
+          if (scheduleData) {
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+          }
+          new Trigger().replace(sheet);
+          break;
+        case "clear-time":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          Schedule.setTime(sheet);
           scheduleData = new Schedule(sheet).getScheduleData(true);
           if (scheduleData) {
             message = Slack.settingsSchedule(scheduleData);

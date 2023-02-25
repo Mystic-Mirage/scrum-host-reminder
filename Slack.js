@@ -544,6 +544,14 @@ class Slack {
               action_id: "set-time",
             },
             {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Clear",
+              },
+              action_id: "clear-time",
+            },
+            {
               type: "static_select",
               placeholder: {
                 type: "plain_text",

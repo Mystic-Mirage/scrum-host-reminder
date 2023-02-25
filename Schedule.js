@@ -197,11 +197,28 @@ class Schedule {
     }
   }
 
+  /**
+   * Set reminder time
+   *
+   * @param {SpreadsheetApp.Sheet} sheet
+   * @param {any} [value]
+   */
   static setTime(sheet, value) {
-    sheet.getRange(1, 7).setValue(value);
+    const range = sheet.getRange(1, 7);
+    if (value) {
+      range.setValue(value);
+    } else {
+      range.clearContent();
+    }
     SpreadsheetApp.flush();
   }
 
+  /**
+   * Set reminder timezone
+   *
+   * @param {SpreadsheetApp.Sheet} sheet
+   * @param {any} value
+   */
   static setTimeZone(sheet, value) {
     sheet.getRange(1, 8).setValue(value);
     SpreadsheetApp.flush();
