@@ -415,6 +415,7 @@ class Slack {
             text: {
               type: "plain_text",
               text: "Close ❎",
+              emoji: false,
             },
             action_id: "close-settings",
           },
@@ -435,6 +436,7 @@ class Slack {
             text: {
               type: "plain_text",
               text: host.active ? "✅" : "❌",
+              emoji: false,
             },
             value: host.slackId,
             action_id: "toggle-host",
@@ -536,6 +538,7 @@ class Slack {
             text: {
               type: "plain_text",
               text: week[j] ? "✅" : "❌",
+              emoji: false,
             },
             value: JSON.stringify([i, j]),
             action_id: `toggle-day-${j}`,
@@ -551,6 +554,7 @@ class Slack {
             text: {
               type: "plain_text",
               text: "➕",
+              emoji: false,
             },
             action_id: "add-week",
           };
@@ -561,6 +565,7 @@ class Slack {
             text: {
               type: "plain_text",
               text: "➖",
+              emoji: false,
             },
             action_id: "remove-week",
           };
@@ -600,6 +605,7 @@ class Slack {
             text: {
               type: "plain_text",
               text: "Close ❎",
+              emoji: false,
             },
             action_id: "close-settings",
           },
