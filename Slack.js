@@ -445,7 +445,25 @@ class Slack {
     data.blocks.push(
       {
         type: "divider",
-      }
+      },
+      {
+        type: "section",
+        text: {
+          type: "plain_text",
+          text: "Re-read the channel members",
+        },
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "↻",
+          },
+          action_id: "refresh-hosts",
+        },
+      },
+      {
+        type: "divider",
+      },
     );
 
     return data;

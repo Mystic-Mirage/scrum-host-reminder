@@ -77,7 +77,10 @@ function doPost(e) {
       }
     }
   } else if (e.parameter.payload) {
-    /** @type {{actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "close-settings", value: string}[], channel: {id: string}, message: Object, response_url: string}} */
+    /** @type {{
+     * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" | "close-settings", value: string}[],
+     * channel: {id: string}, message: Object, response_url: string
+     * }} */
     const payload = JSON.parse(e.parameter.payload);
     console.log(payload);
 
@@ -99,6 +102,11 @@ function doPost(e) {
         hosts.toggle(payload.actions[0].value);
         const message = Slack.settingsHosts(hosts.all);
         new Slack().responseMessage(payload.response_url, message)
+        break;
+      case "refresh-hosts":
+        sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+        refreshHosts(sheet);
+        new Slack().responseMessage(payload.response_url, Slack.settingsHosts(new Hosts(sheet).all))
         break;
       case "close-settings":
         new Slack().deleteMessage(payload.response_url);

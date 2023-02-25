@@ -131,7 +131,6 @@ function reReadMembers() {
   const ui = SpreadsheetApp.getUi();
   const sheet = SpreadsheetApp.getActive().getActiveSheet();
   const sheetName = sheet.getName();
-  const channelId = sheetName;
 
   if (sheetName === TIMEZONES_SHEET_NAME) {
     ui.alert(`You cannot do this with "${TIMEZONES_SHEET_NAME}"!`);
@@ -142,8 +141,17 @@ function reReadMembers() {
 
   if (result === ui.Button.NO) return;
 
+  refreshHosts(sheet);
+}
+
+/**
+ * Refresh a channel member list
+ *
+ * @param {SpreadsheetApp.Sheet} sheet
+ */
+function refreshHosts(sheet) {
   const slack = new Slack();
-  const members = slack.getMembers(channelId);
+  const members = slack.getMembers(sheet.getName());
 
   const hosts = new Hosts(sheet).all;
 
