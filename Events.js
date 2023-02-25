@@ -216,6 +216,7 @@ function doPost(e) {
     const contents = JSON.parse(e.postData.contents);
     console.log(contents);
 
+    let sheet;
     switch (contents.type) {
       case "url_verification":
         return ContentService.createTextOutput(contents.challenge);
@@ -224,11 +225,14 @@ function doPost(e) {
         if (contents.api_app_id === props.SLACK_APP_ID) {
           switch (contents.event.type) {
             case "member_joined_channel":
-              new Slack().sendEphemeral(contents.event.channel, contents.event.inviter);
-              newSheet(contents.event.channel);
+              sheet = SpreadsheetApp.getActive().getSheetByName(contents.event.channel);
+              if (!sheet) {
+                newSheet(contents.event.channel);
+                new Slack().sendEphemeral(contents.event.channel, contents.event.inviter);
+              }
               break;
             case "member_left_channel":
-              const sheet = SpreadsheetApp.getActive().getSheetByName(contents.event.channel);
+              sheet = SpreadsheetApp.getActive().getSheetByName(contents.event.channel);
               if (sheet) {
                 deleteSheet(sheet);
               }
