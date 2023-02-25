@@ -475,20 +475,30 @@ class Slack {
    * @param {ScheduleData} scheduleData
    */
   static settingsSchedule(scheduleData) {
+    let initialTime;
+    if (scheduleData.timeAt) {
+      initialTime = [scheduleData.timeAt.getHours(), scheduleData.timeAt.getMinutes()].map((value) => String(value).padStart(2, "0")).join(":");
+    }
+
     const tzOptionGroups = [];
+    let tzInitialOption;
     for (const [section, options] of Object.entries(Schedule.timeZones())) {
       const tzOptionGroupOptions = [];
       for (const [option, tz] of Object.entries(options)) {
-        tzOptionGroupOptions.push(
-          {
-            text: {
-              type: "plain_text",
-              text: option,
-            },
-            value: tz,
-          }
-        );
+        const tzOptionGroupOption = {
+          text: {
+            type: "plain_text",
+            text: option,
+          },
+          value: tz,
+        };
+        tzOptionGroupOptions.push(tzOptionGroupOption);
+
+        if (tz === scheduleData.timeZone) {
+          tzInitialOption = tzOptionGroupOption;
+        }
       }
+
       tzOptionGroups.push(
         {
           label: {
@@ -530,6 +540,7 @@ class Slack {
                 type: "plain_text",
                 text: "Time",
               },
+              initial_time: initialTime,
               action_id: "set-time",
             },
             {
@@ -539,6 +550,7 @@ class Slack {
                 text: "Timezone",
               },
               option_groups: tzOptionGroups,
+              initial_option: tzInitialOption,
               action_id: "set-timezone",
             },
           ],

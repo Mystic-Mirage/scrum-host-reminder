@@ -136,7 +136,6 @@ class Schedule {
     SpreadsheetApp.flush();
   }
 
-
   /**
    *
    * @returns {{[p: string]: {[p: string]: string}}}
@@ -196,6 +195,16 @@ class Schedule {
       }
       prev = range;
     }
+  }
+
+  static setTime(sheet, value) {
+    sheet.getRange(1, 7).setValue(value);
+    SpreadsheetApp.flush();
+  }
+
+  static setTimeZone(sheet, value) {
+    sheet.getRange(1, 8).setValue(value);
+    SpreadsheetApp.flush();
   }
 }
 
