@@ -198,6 +198,7 @@ function doPost(e) {
         if (contents.api_app_id === props.SLACK_APP_ID) {
           switch (contents.event.type) {
             case "member_joined_channel":
+              new Slack().sendEphemeral(contents.event.channel, contents.event.inviter);
               newSheet(contents.event.channel);
               break;
             case "member_left_channel":

@@ -665,6 +665,26 @@ class Slack {
       ],
     };
   }
+
+  /**
+   * Send ephemeral message
+   *
+   * @param {string} channelId
+   * @param {string} userId
+   */
+  sendEphemeral(channelId, userId) {
+    const data = {
+      channel: channelId,
+      user: userId,
+      text: "Hello!\n\n" +
+        "Scrum Host Reminder helps decide who is in charge of daily meetings.\n\n" +
+        "To manage a host list and set up a reminder schedule, please, use these commands:\n" +
+        "- /shr-hosts\n" +
+        "- /shr-schedule\n\n" +
+        "Have a nice day!"
+    }
+    this.postApi("chat.postEphemeral", data);
+  }
 }
 
 function debugGetMembers() {
