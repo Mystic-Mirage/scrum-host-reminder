@@ -428,8 +428,8 @@ class Slack {
         let row = {
           type: "section",
           text: {
-            type: "plain_text",
-            text: host.name,
+            type: "mrkdwn",
+            text: host.active ? `*${host.name}*` : host.name,
           },
           accessory: {
             type: "button",
