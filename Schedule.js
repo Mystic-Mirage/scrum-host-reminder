@@ -137,6 +137,7 @@ class Schedule {
   }
 
   /**
+   * Return timezones organized into groups
    *
    * @returns {{[p: string]: {[p: string]: string}}}
    */
@@ -167,6 +168,10 @@ class Schedule {
 
     return timezones;
   }
+
+  /**
+   * Add a week to a schedule
+   */
   addWeek() {
     /** @type {SpreadsheetApp.Range} */
     let prev;
@@ -183,6 +188,9 @@ class Schedule {
     }
   }
 
+  /**
+   * Remove a week from a schedule
+   */
   removeWeek() {
     /** @type {SpreadsheetApp.Range} */
     let prev;
@@ -200,6 +208,7 @@ class Schedule {
   }
 
   /**
+   * Toggle a day of week
    *
    * @param {number} week
    * @param {number} day
