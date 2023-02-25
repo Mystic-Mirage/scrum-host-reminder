@@ -78,8 +78,8 @@ function doPost(e) {
     }
   } else if (e.parameter.payload) {
     /** @type {{
-     * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" | "set-time" | "clear-time" | "set-timezone" | "close-settings",
-     * value?: string, selected_time?: string, selected_option?: {value: string}}[],
+     * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" | "set-time" | "clear-time" | "set-timezone" | "set-start-point" | "close-settings",
+     * value?: string, selected_time?: string, selected_option?: {value: string}, selected_date?: string}[],
      * channel: {id: string}, message: Object, response_url: string
      * }} */
     const payload = JSON.parse(e.parameter.payload);
@@ -134,6 +134,16 @@ function doPost(e) {
         case "set-timezone":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           Schedule.setTimeZone(sheet, action.selected_option.value);
+          scheduleData = new Schedule(sheet).getScheduleData(true);
+          if (scheduleData) {
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+          }
+          new Trigger().replace(sheet);
+          break;
+        case "set-start-point":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          Schedule.setStartPoint(sheet, action.selected_date);
           scheduleData = new Schedule(sheet).getScheduleData(true);
           if (scheduleData) {
             message = Slack.settingsSchedule(scheduleData);

@@ -475,13 +475,16 @@ class Slack {
    * @param {ScheduleData} scheduleData
    */
   static settingsSchedule(scheduleData) {
-    let initialTime;
+    let initialStartPoint, initialTime, initialTimezone;
+    if (scheduleData.startPoint) {
+      initialStartPoint = scheduleData.startPoint.toISOString().slice(0, 10);
+    }
+
     if (scheduleData.timeAt) {
-      initialTime = [scheduleData.timeAt.getHours(), scheduleData.timeAt.getMinutes()].map((value) => String(value).padStart(2, "0")).join(":");
+      initialTime = scheduleData.timeAt.toISOString().slice(11, 16);
     }
 
     const tzOptionGroups = [];
-    let tzInitialOption;
     for (const [section, options] of Object.entries(Schedule.timeZones())) {
       const tzOptionGroupOptions = [];
       for (const [option, tz] of Object.entries(options)) {
@@ -495,7 +498,7 @@ class Slack {
         tzOptionGroupOptions.push(tzOptionGroupOption);
 
         if (tz === scheduleData.timeZone) {
-          tzInitialOption = tzOptionGroupOption;
+          initialTimezone = tzOptionGroupOption;
         }
       }
 
@@ -558,8 +561,29 @@ class Slack {
                 text: "Timezone",
               },
               option_groups: tzOptionGroups,
-              initial_option: tzInitialOption,
+              initial_option: initialTimezone,
               action_id: "set-timezone",
+            },
+          ],
+        },
+        {
+          type: "section",
+          text: {
+            type: "plain_text",
+            text: "Start point"
+          },
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "datepicker",
+              initial_date: initialStartPoint,
+              placeholder: {
+                type: "plain_text",
+                text: "Start point",
+              },
+              action_id: "set-start-point"
             },
           ],
         },

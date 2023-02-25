@@ -198,10 +198,21 @@ class Schedule {
   }
 
   /**
+   * Set schedule start point
+   *
+   * @param {SpreadsheetApp.Sheet} sheet
+   * @param {string} value
+   */
+  static setStartPoint(sheet, value) {
+    sheet.getRange(1, 6).setValue(value);
+    SpreadsheetApp.flush();
+  }
+
+  /**
    * Set reminder time
    *
    * @param {SpreadsheetApp.Sheet} sheet
-   * @param {any} [value]
+   * @param {string} [value]
    */
   static setTime(sheet, value) {
     const range = sheet.getRange(1, 7);
@@ -217,7 +228,7 @@ class Schedule {
    * Set reminder timezone
    *
    * @param {SpreadsheetApp.Sheet} sheet
-   * @param {any} value
+   * @param {string} value
    */
   static setTimeZone(sheet, value) {
     sheet.getRange(1, 8).setValue(value);
