@@ -450,6 +450,87 @@ class Slack {
 
     return data;
   }
+
+  /**
+   * Compose a schedule settings message
+   *
+   * @param {ScheduleData} scheduleData
+   */
+  static settingsSchedule(scheduleData) {
+    const tzOptionGroups = [];
+    for (const [section, options] of Object.entries(Schedule.timeZones())) {
+      const tzOptionGroupOptions = [];
+      for (const [option, tz] of Object.entries(options)) {
+        tzOptionGroupOptions.push(
+          {
+            text: {
+              type: "plain_text",
+              text: option,
+            },
+            value: tz,
+          }
+        );
+      }
+      tzOptionGroups.push(
+        {
+          label: {
+            type: "plain_text",
+            text: section,
+          },
+          options: tzOptionGroupOptions,
+        }
+      );
+    }
+
+    return {
+      text: "Schedule",
+      blocks: [
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "*Reminder schedule setup*",
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Close ❎",
+            },
+            action_id: "close-settings",
+          },
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "timepicker",
+              placeholder: {
+                type: "plain_text",
+                text: "Time",
+              },
+              action_id: "set-time",
+            },
+            {
+              type: "static_select",
+              placeholder: {
+                type: "plain_text",
+                text: "Timezone",
+              },
+              option_groups: tzOptionGroups,
+              action_id: "set-timezone",
+            },
+          ],
+        },
+        {
+          type: "divider",
+        },
+      ],
+    };
+  }
 }
 
 function debugGetMembers() {

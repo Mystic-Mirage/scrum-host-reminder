@@ -57,11 +57,23 @@ function doPost(e) {
 
     const sheet = SpreadsheetApp.getActive().getSheetByName(e.parameter.channel_id);
     if (sheet) {
+      let message;
+
       switch (e.parameter.command) {
-        case "/hosts":
+        case "/shr-hosts":
           const hosts = new Hosts(sheet);
-          const message = Slack.settingsHosts(hosts.all);
-          return ContentService.createTextOutput(JSON.stringify(message)).setMimeType(ContentService.MimeType.JSON);
+          if (hosts.all) {
+            message = Slack.settingsHosts(hosts.all);
+            return ContentService.createTextOutput(JSON.stringify(message)).setMimeType(ContentService.MimeType.JSON);
+          }
+          break;
+        case "/shr-schedule":
+          const scheduleData = new Schedule(sheet).getScheduleData(true);
+          if (scheduleData) {
+            message = Slack.settingsSchedule(scheduleData);
+            return ContentService.createTextOutput(JSON.stringify(message)).setMimeType(ContentService.MimeType.JSON);
+          }
+          break;
       }
     }
   } else if (e.parameter.payload) {

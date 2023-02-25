@@ -31,6 +31,15 @@ function getNow() {
 }
 
 /**
+ * @typedef ScheduleData
+ * @property {Date} startPoint
+ * @property {Date} timeAt
+ * @property {string} timeZone
+ * @property {boolean[]} schedule
+ * @property {boolean[][]} weeks
+ */
+
+/**
  * Schedule data processor
  */
 class Schedule {
@@ -46,25 +55,27 @@ class Schedule {
   /**
    * Retrieve schedule data from a sheet
    *
-   * @private
-   * @returns {{startPoint: Date, timeAt: Date, timeZone: string, schedule: boolean[]} | null}
+   * @param {boolean} [force]
+   * @returns {ScheduleData | null}
    */
-  getScheduleData() {
+  getScheduleData(force = false) {
     const rows = this.sheet.getDataRange().getValues();
     const [startPoint, timeAt, timeZone] = rows[0].slice(5);
 
-    if (!(startPoint && timeAt && timeZone)) return null;
+    if (!(force || startPoint && timeAt && timeZone)) return null;
 
     const schedule = [];
+    const weeks = [];
     for (const row of rows.slice(1)) {
       const days = row.slice(5);
 
       if (days[0] === "") break;
 
       schedule.push(...days);
+      weeks.push(days);
     }
 
-    return {startPoint, timeAt, timeZone, schedule};
+    return {startPoint, timeAt, timeZone, schedule, weeks};
   }
 
   /**
@@ -125,6 +136,38 @@ class Schedule {
     SpreadsheetApp.flush();
   }
 
+
+  /**
+   *
+   * @returns {{[p: string]: {[p: string]: string}}}
+   */
+  static timeZones() {
+    const timezones = {};
+
+    for (const [tz] of SpreadsheetApp.getActive().getSheetByName(TIMEZONES_SHEET_NAME).getDataRange().getValues()) {
+      const delimiterIndex = tz.indexOf("/");
+      let section, option;
+      if (delimiterIndex < 1) {
+        section = "Other";
+        option = tz;
+      } else {
+        section = tz.slice(0, delimiterIndex);
+        option = tz.slice(delimiterIndex + 1)
+      }
+
+      while (Object.keys(timezones[section] || {}).length >= 100) {
+        section += " ";
+      }
+
+      if (!timezones[section]) {
+        timezones[section] = {};
+      }
+
+      timezones[section][option.replaceAll("_", " ")] = tz;
+    }
+
+    return timezones;
+  }
   addWeek() {
     /** @type {SpreadsheetApp.Range} */
     let prev;
@@ -171,4 +214,8 @@ function debugAddWeek() {
 function debugRemoveWeek() {
   const sheet = SpreadsheetApp.getActive().getSheets()[1];
   new Schedule(sheet).removeWeek();
+}
+
+function debugTimezones() {
+  console.log(Schedule.timeZones());
 }
