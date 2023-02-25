@@ -93,76 +93,96 @@ function doPost(e) {
       switch (action.action_id) {
         case "next-host":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          nextHostMessage(sheet, payload.response_url);
+          if (sheet) {
+            nextHostMessage(sheet, payload.response_url);
+          }
           break;
         case "skip-meeting":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          new Hosts(sheet).skipMeeting();
-          new Slack().markMessageSkipped(payload.message, payload.response_url);
+          if (sheet) {
+            new Hosts(sheet).skipMeeting();
+            new Slack().markMessageSkipped(payload.message, payload.response_url);
+          }
           break;
         case "toggle-host":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          const hosts = new Hosts(sheet);
-          hosts.toggle(action.value);
-          message = Slack.settingsHosts(hosts.all);
-          new Slack().responseMessage(payload.response_url, message)
+          if (sheet) {
+            const hosts = new Hosts(sheet);
+            hosts.toggle(action.value);
+            message = Slack.settingsHosts(hosts.all);
+            new Slack().responseMessage(payload.response_url, message)
+          }
           break;
         case "refresh-hosts":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          const slack = new Slack();
-          message = Slack.settingsHosts();
-          slack.responseMessage(payload.response_url, message);
-          refreshHosts(sheet);
-          message = Slack.settingsHosts(new Hosts(sheet).all);
-          slack.responseMessage(payload.response_url, message);
+          if (sheet) {
+            const slack = new Slack();
+            message = Slack.settingsHosts();
+            slack.responseMessage(payload.response_url, message);
+            refreshHosts(sheet);
+            message = Slack.settingsHosts(new Hosts(sheet).all);
+            slack.responseMessage(payload.response_url, message);
+          }
           break;
         case "set-time":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          Schedule.setTime(sheet, action.selected_time);
-          scheduleData = new Schedule(sheet).getScheduleData(true);
-          message = Slack.settingsSchedule(scheduleData);
-          new Slack().responseMessage(payload.response_url, message);
-          new Trigger().replace(sheet);
+          if (sheet) {
+            Schedule.setTime(sheet, action.selected_time);
+            scheduleData = new Schedule(sheet).getScheduleData(true);
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+            new Trigger().replace(sheet);
+          }
           break;
         case "clear-time":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          Schedule.setTime(sheet);
-          scheduleData = new Schedule(sheet).getScheduleData(true);
-          message = Slack.settingsSchedule(scheduleData);
-          new Slack().responseMessage(payload.response_url, message);
-          new Trigger().replace(sheet);
+          if (sheet) {
+            Schedule.setTime(sheet);
+            scheduleData = new Schedule(sheet).getScheduleData(true);
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+            new Trigger().replace(sheet);
+          }
           break;
         case "set-timezone":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          Schedule.setTimeZone(sheet, action.selected_option.value);
-          scheduleData = new Schedule(sheet).getScheduleData(true);
-          message = Slack.settingsSchedule(scheduleData);
-          new Slack().responseMessage(payload.response_url, message);
-          new Trigger().replace(sheet);
+          if (sheet) {
+            Schedule.setTimeZone(sheet, action.selected_option.value);
+            scheduleData = new Schedule(sheet).getScheduleData(true);
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+            new Trigger().replace(sheet);
+          }
           break;
         case "set-start-point":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          Schedule.setStartPoint(sheet, action.selected_date);
-          scheduleData = new Schedule(sheet).getScheduleData(true);
-          message = Slack.settingsSchedule(scheduleData);
-          new Slack().responseMessage(payload.response_url, message);
-          new Trigger().replace(sheet);
+          if (sheet) {
+            Schedule.setStartPoint(sheet, action.selected_date);
+            scheduleData = new Schedule(sheet).getScheduleData(true);
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+            new Trigger().replace(sheet);
+          }
           break;
         case "add-week":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          new Schedule(sheet).addWeek();
-          scheduleData = new Schedule(sheet).getScheduleData(true);
-          message = Slack.settingsSchedule(scheduleData);
-          new Slack().responseMessage(payload.response_url, message);
-          new Trigger().replace(sheet);
+          if (sheet) {
+            new Schedule(sheet).addWeek();
+            scheduleData = new Schedule(sheet).getScheduleData(true);
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+            new Trigger().replace(sheet);
+          }
           break;
         case "remove-week":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          new Schedule(sheet).removeWeek();
-          scheduleData = new Schedule(sheet).getScheduleData(true);
-          message = Slack.settingsSchedule(scheduleData);
-          new Slack().responseMessage(payload.response_url, message);
-          new Trigger().replace(sheet);
+          if (sheet) {
+            new Schedule(sheet).removeWeek();
+            scheduleData = new Schedule(sheet).getScheduleData(true);
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+            new Trigger().replace(sheet);
+          }
           break;
         case "toggle-day-0":
         case "toggle-day-1":
@@ -171,13 +191,15 @@ function doPost(e) {
         case "toggle-day-4":
         case "toggle-day-5":
         case "toggle-day-6":
-          const [week, day] = JSON.parse(action.value);
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
-          new Schedule(sheet).toggleDay(week, day);
-          scheduleData = new Schedule(sheet).getScheduleData(true);
-          message = Slack.settingsSchedule(scheduleData);
-          new Slack().responseMessage(payload.response_url, message);
-          new Trigger().replace(sheet);
+          if (sheet) {
+            const [week, day] = JSON.parse(action.value);
+            new Schedule(sheet).toggleDay(week, day);
+            scheduleData = new Schedule(sheet).getScheduleData(true);
+            message = Slack.settingsSchedule(scheduleData);
+            new Slack().responseMessage(payload.response_url, message);
+            new Trigger().replace(sheet);
+          }
           break;
         case "close-settings":
           new Slack().deleteMessage(payload.response_url);
@@ -203,7 +225,9 @@ function doPost(e) {
               break;
             case "member_left_channel":
               const sheet = SpreadsheetApp.getActive().getSheetByName(contents.event.channel);
-              deleteSheet(sheet);
+              if (sheet) {
+                deleteSheet(sheet);
+              }
               break;
           }
         }
