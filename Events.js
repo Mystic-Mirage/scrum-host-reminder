@@ -95,6 +95,8 @@ function doPost(e) {
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           if (sheet) {
             nextHostMessage(sheet, payload.response_url);
+          } else {
+            new Slack().disarmMessage(payload.message, payload.response_url);
           }
           break;
         case "skip-meeting":
@@ -102,6 +104,8 @@ function doPost(e) {
           if (sheet) {
             new Hosts(sheet).skipMeeting();
             new Slack().markMessageSkipped(payload.message, payload.response_url);
+          } else {
+            new Slack().disarmMessage(payload.message, payload.response_url);
           }
           break;
         case "toggle-host":

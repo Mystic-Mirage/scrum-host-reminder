@@ -223,6 +223,20 @@ class Slack {
   }
 
   /**
+   * Remove buttons from a requesting message
+   *
+   * @param {Object} message
+   * @param {Object[]} message.blocks
+   * @param {string} responseUrl
+   */
+  disarmMessage(message, responseUrl) {
+    const data = {
+      blocks: removeActions(message.blocks),
+    };
+    this.post(responseUrl, data);
+  }
+
+  /**
    * Add `Sipped` mark to a message
    *
    * @param {Object} message
