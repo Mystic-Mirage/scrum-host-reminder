@@ -513,6 +513,64 @@ class Slack {
       );
     }
 
+    const weeks = [];
+    for (let i = 0; i < scheduleData.weeks.length; i++) {
+      const week = scheduleData.weeks[i];
+      const elements = [];
+      for (let j = 0; j < week.length; j++) {
+        elements.push(
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: week[j] ? "✅" : "❌",
+            },
+            value: JSON.stringify([i, j]),
+            action_id: `toggle-day-${j}`,
+          }
+        );
+      }
+
+      let accessory;
+      switch (i) {
+        case 0:
+          accessory = {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "➕",
+            },
+            action_id: "add-week",
+          };
+          break;
+        case scheduleData.weeks.length - 1:
+          accessory = {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "➖",
+            },
+            action_id: "remove-week",
+          };
+          break;
+      }
+
+      weeks.push(
+        {
+          type: "section",
+          text: {
+            type: "plain_text",
+            text: `Week ${scheduleData.weeks.length > 1 ? String(i + 1) : ""}`
+          },
+          accessory: accessory,
+        },
+        {
+          type: "actions",
+          elements: elements,
+        },
+      );
+    }
+
     return {
       text: "Schedule",
       blocks: [
@@ -587,6 +645,7 @@ class Slack {
             },
           ],
         },
+        ...weeks,
         {
           type: "divider",
         },

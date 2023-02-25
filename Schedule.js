@@ -67,7 +67,7 @@ class Schedule {
     const schedule = [];
     const weeks = [];
     for (const row of rows.slice(1)) {
-      const days = row.slice(5);
+      const days = row.slice(5, 12);
 
       if (days[0] === "") break;
 
@@ -171,10 +171,11 @@ class Schedule {
     /** @type {SpreadsheetApp.Range} */
     let prev;
     for (let i = 2; i < this.sheet.getMaxRows(); i++) {
-      const range = this.sheet.getRange(i, 6, 1, this.sheet.getMaxColumns());
+      const range = this.sheet.getRange(i, 6, 1, 7);
       if (range.getValue() === "") {
         if (prev.getRow()) {
           prev.copyTo(range);
+          SpreadsheetApp.flush();
         }
         break;
       }
@@ -186,14 +187,28 @@ class Schedule {
     /** @type {SpreadsheetApp.Range} */
     let prev;
     for (let i = 3; i < this.sheet.getMaxRows(); i++) {
-      const range = this.sheet.getRange(i, 6, 1, this.sheet.getMaxColumns());
+      const range = this.sheet.getRange(i, 6, 1, 7);
       if (range.getValue() === "") {
         if (prev) {
           prev.clearContent().removeCheckboxes();
+          SpreadsheetApp.flush();
         }
         break;
       }
       prev = range;
+    }
+  }
+
+  /**
+   *
+   * @param {number} week
+   * @param {number} day
+   */
+  toggleDay(week, day) {
+    const range = this.sheet.getRange(week + 2, day + 6);
+    if (range.isChecked() !== null) {
+      range.setValue(!range.getValue());
+      SpreadsheetApp.flush();
     }
   }
 

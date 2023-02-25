@@ -78,7 +78,9 @@ function doPost(e) {
     }
   } else if (e.parameter.payload) {
     /** @type {{
-     * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" | "set-time" | "clear-time" | "set-timezone" | "set-start-point" | "close-settings",
+     * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" |
+     * "set-time" | "clear-time" | "set-timezone" | "set-start-point" | "add-week" | "remove-week" | "close-settings" |
+     * "toggle-day-0" | "toggle-day-1" | "toggle-day-2" | "toggle-day-3" | "toggle-day-4" | "toggle-day-5" | "toggle-day-6",
      * value?: string, selected_time?: string, selected_option?: {value: string}, selected_date?: string}[],
      * channel: {id: string}, message: Object, response_url: string
      * }} */
@@ -115,40 +117,63 @@ function doPost(e) {
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           Schedule.setTime(sheet, action.selected_time);
           scheduleData = new Schedule(sheet).getScheduleData(true);
-          if (scheduleData) {
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-          }
+          message = Slack.settingsSchedule(scheduleData);
+          new Slack().responseMessage(payload.response_url, message);
           new Trigger().replace(sheet);
           break;
         case "clear-time":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           Schedule.setTime(sheet);
           scheduleData = new Schedule(sheet).getScheduleData(true);
-          if (scheduleData) {
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-          }
+          message = Slack.settingsSchedule(scheduleData);
+          new Slack().responseMessage(payload.response_url, message);
           new Trigger().replace(sheet);
           break;
         case "set-timezone":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           Schedule.setTimeZone(sheet, action.selected_option.value);
           scheduleData = new Schedule(sheet).getScheduleData(true);
-          if (scheduleData) {
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-          }
+          message = Slack.settingsSchedule(scheduleData);
+          new Slack().responseMessage(payload.response_url, message);
           new Trigger().replace(sheet);
           break;
         case "set-start-point":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           Schedule.setStartPoint(sheet, action.selected_date);
           scheduleData = new Schedule(sheet).getScheduleData(true);
-          if (scheduleData) {
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-          }
+          message = Slack.settingsSchedule(scheduleData);
+          new Slack().responseMessage(payload.response_url, message);
+          new Trigger().replace(sheet);
+          break;
+        case "add-week":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          new Schedule(sheet).addWeek();
+          scheduleData = new Schedule(sheet).getScheduleData(true);
+          message = Slack.settingsSchedule(scheduleData);
+          new Slack().responseMessage(payload.response_url, message);
+          new Trigger().replace(sheet);
+          break;
+        case "remove-week":
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          new Schedule(sheet).removeWeek();
+          scheduleData = new Schedule(sheet).getScheduleData(true);
+          message = Slack.settingsSchedule(scheduleData);
+          new Slack().responseMessage(payload.response_url, message);
+          new Trigger().replace(sheet);
+          break;
+        case "toggle-day-0":
+        case "toggle-day-1":
+        case "toggle-day-2":
+        case "toggle-day-3":
+        case "toggle-day-4":
+        case "toggle-day-5":
+        case "toggle-day-6":
+          const [week, day] = JSON.parse(action.value);
+          sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          new Schedule(sheet).toggleDay(week, day);
+          scheduleData = new Schedule(sheet).getScheduleData(true);
+          message = Slack.settingsSchedule(scheduleData);
+          new Slack().responseMessage(payload.response_url, message);
           new Trigger().replace(sheet);
           break;
         case "close-settings":
