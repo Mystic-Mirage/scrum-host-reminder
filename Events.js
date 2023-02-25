@@ -109,9 +109,12 @@ function doPost(e) {
           break;
         case "refresh-hosts":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
+          const slack = new Slack();
+          message = Slack.settingsHosts();
+          slack.responseMessage(payload.response_url, message);
           refreshHosts(sheet);
           message = Slack.settingsHosts(new Hosts(sheet).all);
-          new Slack().responseMessage(payload.response_url, message);
+          slack.responseMessage(payload.response_url, message);
           break;
         case "set-time":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);

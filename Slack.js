@@ -394,7 +394,7 @@ class Slack {
   /**
    * Compose a hosts settings message
    *
-   * @param {Host[]} hosts
+   * @param {Host[]} [hosts]
    * @returns {Object}
    */
   static settingsHosts(hosts) {
@@ -422,24 +422,36 @@ class Slack {
       ],
     };
 
-    for (const host of hosts) {
-      let row = {
-        type: "section",
-        text: {
-          type: "plain_text",
-          text: host.name,
-        },
-        accessory: {
-          type: "button",
+    if (hosts) {
+      for (const host of hosts) {
+        let row = {
+          type: "section",
           text: {
             type: "plain_text",
-            text: host.active ? "✅" : "❌",
+            text: host.name,
           },
-          value: host.slackId,
-          action_id: "toggle-host",
-        },
-      };
-      data.blocks.push(row);
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: host.active ? "✅" : "❌",
+            },
+            value: host.slackId,
+            action_id: "toggle-host",
+          },
+        };
+        data.blocks.push(row);
+      }
+    } else {
+      data.blocks.push(
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "*_Refreshing..._*",
+          }
+        }
+      );
     }
 
     data.blocks.push(
@@ -449,8 +461,8 @@ class Slack {
       {
         type: "section",
         text: {
-          type: "plain_text",
-          text: "Re-read the channel members",
+          type: "mrkdwn",
+          text: "_Re-read the channel members_",
         },
         accessory: {
           type: "button",
