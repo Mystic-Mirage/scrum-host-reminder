@@ -227,7 +227,8 @@ function doPost(e) {
             case "member_joined_channel":
               sheet = SpreadsheetApp.getActive().getSheetByName(contents.event.channel);
               if (!sheet) {
-                newSheet(contents.event.channel);
+                sheet = newSheet(contents.event.channel);
+                refreshHosts(sheet);
                 new Slack().sendEphemeral(contents.event.channel, contents.event.inviter);
               }
               break;
