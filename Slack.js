@@ -416,6 +416,7 @@ class Slack {
   /**
    * Respond to a message by replacing it
    *
+   * @private
    * @param {string} responseUrl
    * @param {Object} data
    */
@@ -516,20 +517,20 @@ class Slack {
           },
           confirm: {
             title: {
-                type: "plain_text",
-                text: "Confirm",
+              type: "plain_text",
+              text: "Confirm",
             },
             text: {
-                type: "plain_text",
-                text: "Re-read the channel members?",
+              type: "plain_text",
+              text: "Re-read the channel members?",
             },
             confirm: {
-                type: "plain_text",
-                text: "Yes",
+              type: "plain_text",
+              text: "Yes",
             },
             deny: {
-                type: "plain_text",
-                text: "No",
+              type: "plain_text",
+              text: "No",
             },
           },
           action_id: "refresh-hosts",
@@ -541,6 +542,17 @@ class Slack {
     );
 
     return data;
+  }
+
+  /**
+   * Send hosts settings message
+   *
+   * @param {string} responseUrl
+   * @param {Host[]} [hosts]
+   */
+  settingsHostsMessage(responseUrl, hosts) {
+    const data = this.constructor.settingsHosts(hosts);
+    this.responseMessage(responseUrl, data);
   }
 
   /**
@@ -726,6 +738,17 @@ class Slack {
         },
       ],
     };
+  }
+
+  /**
+   * Send schedule settings message
+   *
+   * @param {string} responseUrl
+   * @param {ScheduleData} scheduleData
+   */
+  settingsScheduleMessage(responseUrl, scheduleData) {
+    const data = this.constructor.settingsSchedule(scheduleData);
+    this.responseMessage(responseUrl, data);
   }
 
   /**

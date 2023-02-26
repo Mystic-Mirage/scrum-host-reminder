@@ -56,8 +56,11 @@ class Schedule {
   /**
    * Retrieve schedule data from a sheet
    *
-   * @param {boolean} [force]
+   * @param {false} force
    * @returns {ScheduleData | null}
+   *
+   * @param {true} force
+   * @returns {ScheduleData}
    */
   getScheduleData(force = false) {
     const rows = this.sheet.getDataRange().getValues();

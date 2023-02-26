@@ -14,6 +14,18 @@ function nextHostMessage(sheet, responseUrl) {
 }
 
 /**
+ * Update settings message with schedule data from a sheet and recreate a trigger
+ *
+ * @param {string} responseUrl
+ * @param {SpreadsheetApp.Sheet} sheet
+ */
+function updateReminder(responseUrl, sheet) {
+  const scheduleData = new Schedule(sheet).getScheduleData(true);
+  new Slack().settingsScheduleMessage(responseUrl, scheduleData);
+  new Trigger(scheduleData.triggerUid).replace(sheet);
+}
+
+/**
  * Installable trigger for Slack notifications
  * Recreate a trigger for the next notification or
  * delete it if no sheet with this trigger can be found
@@ -94,8 +106,6 @@ function doPost(e) {
       }
       LockService.getScriptLock().waitLock(60000);
 
-      let message, scheduleData;
-
       const sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
       if (sheet) {
         switch (action.action_id) {
@@ -109,58 +119,37 @@ function doPost(e) {
           case "toggle-host":
             const hosts = new Hosts(sheet);
             hosts.toggle(action.value);
-            message = Slack.settingsHosts(hosts.all);
-            new Slack().responseMessage(payload.response_url, message)
+            new Slack().settingsHostsMessage(payload.response_url, hosts.all)
             break;
           case "refresh-hosts":
             const slack = new Slack();
-            message = Slack.settingsHosts();
-            slack.responseMessage(payload.response_url, message);
+            slack.settingsHostsMessage(payload.response_url);
             refreshHosts(sheet);
-            message = Slack.settingsHosts(new Hosts(sheet).all);
-            slack.responseMessage(payload.response_url, message);
+            slack.settingsHostsMessage(payload.response_url, new Hosts(sheet).all);
             break;
           case "set-time":
             Schedule.setTime(sheet, action.selected_time);
-            scheduleData = new Schedule(sheet).getScheduleData(true);
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-            new Trigger(scheduleData.triggerUid).replace(sheet);
+            updateReminder(payload.response_url, sheet);
             break;
           case "clear-time":
             Schedule.setTime(sheet);
-            scheduleData = new Schedule(sheet).getScheduleData(true);
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-            new Trigger(scheduleData.triggerUid).replace(sheet);
+            updateReminder(payload.response_url, sheet);
             break;
           case "set-timezone":
             Schedule.setTimeZone(sheet, action.selected_option.value);
-            scheduleData = new Schedule(sheet).getScheduleData(true);
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-            new Trigger(scheduleData.triggerUid).replace(sheet);
+            updateReminder(payload.response_url, sheet);
             break;
           case "set-start-point":
             Schedule.setStartPoint(sheet, action.selected_date);
-            scheduleData = new Schedule(sheet).getScheduleData(true);
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-            new Trigger(scheduleData.triggerUid).replace(sheet);
+            updateReminder(payload.response_url, sheet);
             break;
           case "add-week":
             Schedule.addWeek(sheet);
-            scheduleData = new Schedule(sheet).getScheduleData(true);
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-            new Trigger(scheduleData.triggerUid).replace(sheet);
+            updateReminder(payload.response_url, sheet);
             break;
           case "remove-week":
             Schedule.removeWeek(sheet);
-            scheduleData = new Schedule(sheet).getScheduleData(true);
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-            new Trigger(scheduleData.triggerUid).replace(sheet);
+            updateReminder(payload.response_url, sheet);
             break;
           case "toggle-day-0":
           case "toggle-day-1":
@@ -171,10 +160,7 @@ function doPost(e) {
           case "toggle-day-6":
             const [week, day] = JSON.parse(action.value);
             Schedule.toggleDay(sheet, week, day);
-            scheduleData = new Schedule(sheet).getScheduleData(true);
-            message = Slack.settingsSchedule(scheduleData);
-            new Slack().responseMessage(payload.response_url, message);
-            new Trigger(scheduleData.triggerUid).replace(sheet);
+            updateReminder(payload.response_url, sheet);
             break;
         }
       } else {
