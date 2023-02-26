@@ -324,20 +324,20 @@ class Slack {
               style: "danger",
               confirm: {
                 title: {
-                    type: "plain_text",
-                    text: "Skip the meeting",
+                  type: "plain_text",
+                  text: "Skip the meeting",
                 },
                 text: {
-                    type: "plain_text",
-                    text: "Re-select today's host for the next meeting?",
+                  type: "plain_text",
+                  text: "Re-select today's host for the next meeting?",
                 },
                 confirm: {
-                    type: "plain_text",
-                    text: "Yes",
+                  type: "plain_text",
+                  text: "Yes",
                 },
                 deny: {
-                    type: "plain_text",
-                    text: "No",
+                  type: "plain_text",
+                  text: "No",
                 },
               },
               action_id: "skip-meeting",
@@ -351,20 +351,20 @@ class Slack {
               style: "primary",
               confirm: {
                 title: {
-                    type: "plain_text",
-                    text: "Next host"
+                  type: "plain_text",
+                  text: "Next host"
                 },
                 text: {
-                    type: "plain_text",
-                    text: "Select a new host for today's meeting?",
+                  type: "plain_text",
+                  text: "Select a new host for today's meeting?",
                 },
                 confirm: {
-                    type: "plain_text",
-                    text: "Yes",
+                  type: "plain_text",
+                  text: "Yes",
                 },
                 deny: {
-                    type: "plain_text",
-                    text: "No",
+                  type: "plain_text",
+                  text: "No",
                 },
               },
               action_id: "next-host",
@@ -513,6 +513,24 @@ class Slack {
           text: {
             type: "plain_text",
             text: "↻",
+          },
+          confirm: {
+            title: {
+                type: "plain_text",
+                text: "Confirm",
+            },
+            text: {
+                type: "plain_text",
+                text: "Re-read the channel members?",
+            },
+            confirm: {
+                type: "plain_text",
+                text: "Yes",
+            },
+            deny: {
+                type: "plain_text",
+                text: "No",
+            },
           },
           action_id: "refresh-hosts",
         },
