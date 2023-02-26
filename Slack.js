@@ -138,7 +138,7 @@ class Slack {
    *
    * @private
    * @param {string} path
-   * @param {{[p: string]: string}} data
+   * @param {{[p: string]: any}} data
    * @returns {Object}
    */
   getApi(path, data) {
@@ -156,11 +156,11 @@ class Slack {
    *
    * @private
    * @param {string} channelId
-   * @returns {Object}
+   * @yields {{app_id: string, blocks: Object[], text: string, ts: string}}
    */
   *readHistory(channelId) {
     let nextCursor = "";
-    for (let repeat = 0; repeat < 10; repeat++) {
+    for (let count = 0; count < 10; count++) {
       const data = {
         channel: channelId,
         cursor: nextCursor,
@@ -200,6 +200,34 @@ class Slack {
   getUserInfo(userId) {
     const result = this.getApi("users.info", {user: userId});
     return result.user;
+  }
+
+  /**
+   * Get user list
+   *
+   * @yields {{id: string, real_name: string}}
+   */
+  *usersList() {
+    let nextCursor = "";
+    for (let count = 0; count < 10; count++) {
+      const data = {
+        limit: 200,
+        cursor: nextCursor,
+      };
+      /** @type {{members: {id: string, deleted: boolean, real_name: string, is_bot: boolean}[], response_metadata: {next_cursor: string}}} */
+      const response = this.getApi("users.list", data);
+
+      if (!response.members) break;
+
+      for (const member of response.members) {
+        if (!(member.deleted || member.is_bot)) {
+          yield member;
+        }
+      }
+
+      nextCursor = response.response_metadata.next_cursor;
+      if (!nextCursor) break;
+    }
   }
 
   /**

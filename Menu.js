@@ -85,22 +85,7 @@ function newSheet(channelId) {
       ]
     );
 
-  const slack = new Slack();
-
-  const members = slack.getMembers(channelId);
-  if (members) {
-    let rowIndex = 0;
-    for (const userId of members) {
-      const user = slack.getUserInfo(userId);
-      if (!user.is_bot) {
-        rowIndex++;
-        sheet.getRange(rowIndex, 3).insertCheckboxes();
-        sheet.getRange(rowIndex, 1, 1, 4).setValues([[user.real_name, userId, false, new Date()]]);
-      }
-    }
-  }
-
-  sheet.getRange(1, 1, sheet.getMaxRows(), 4).sort(1);
+  refreshHosts(sheet);
 }
 
 /**
@@ -151,30 +136,42 @@ function reReadMembers() {
  */
 function refreshHosts(sheet) {
   const slack = new Slack();
-  const members = slack.getMembers(sheet.getName());
+  let members = slack.getMembers(sheet.getName());
 
   const hosts = new Hosts(sheet).all;
 
-  sheet.getRange(1, 1, sheet.getMaxRows(), 4).clearContent().removeCheckboxes();
-
-  let rowIndex = 0;
-  for (const userId of members) {
-    const host = hosts.find((host) => host.slackId === userId);
-    if (host) {
-      rowIndex++;
-      sheet.getRange(rowIndex, 3).insertCheckboxes();
-      sheet.getRange(rowIndex, 1, 1, 4).setValues([[host.name, host.slackId, host.active, host.timestamp]]);
-    } else {
-      const user = slack.getUserInfo(userId);
-      if (!user.is_bot) {
-        rowIndex++;
-        sheet.getRange(rowIndex, 3).insertCheckboxes();
-        sheet.getRange(rowIndex, 1, 1, 4).setValues([[user.real_name, userId, false, new Date()]]);
+  const newHosts = [];
+  for (const user of slack.usersList()) {
+    console.log(members);
+    if (members.includes(user.id)) {
+      const host = hosts.find((host) => host.slackId === user.id);
+      if (host) {
+        newHosts.push([user.real_name, user.id, host.active, host.timestamp]);
+      } else {
+        newHosts.push([user.real_name, user.id, false, null]);
       }
+    }
+
+    members = members.filter((userId) => userId !== user.id);
+    if (members.length === 0) break;
+  }
+
+  newHosts.sort();
+
+  for (const host of newHosts) {
+    if (!host[3] === null) {
+      host[3] = new Date();
     }
   }
 
-  sheet.getRange(1, 1, sheet.getMaxRows(), 4).sort(1);
+  const hostsDiff = newHosts.length - hosts.length;
+  if (hostsDiff < 0) {
+    sheet.getRange(newHosts.length + 1, 1, -hostsDiff, 4).clearContent().removeCheckboxes();
+  } else if (hostsDiff > 0) {
+    sheet.getRange(hosts.length + 1, 3, hostsDiff, 1).insertCheckboxes();
+  }
+
+  sheet.getRange(1, 1,newHosts.length, 4).setValues(newHosts);
 }
 
 /**
