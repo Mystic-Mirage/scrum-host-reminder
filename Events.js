@@ -77,6 +77,8 @@ function doPost(e) {
       }
     }
   } else if (e.parameter.payload) {
+    LockService.getScriptLock().waitLock(60000);
+
     /** @type {{
      * actions: {action_id: "next-host" | "skip-meeting" | "toggle-host" | "refresh-hosts" |
      * "set-time" | "clear-time" | "set-timezone" | "set-start-point" | "add-week" | "remove-week" | "close-settings" |
