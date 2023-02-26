@@ -1,3 +1,5 @@
+const TEMPLATE_SHEET_NAME = "template";
+
 /**
  * Get Monday date of the current week
  *
@@ -17,10 +19,22 @@ function getStartOfWeek() {
  * Create, fill and format a new sheet
  *
  * @param {string} channelId
+ * @returns {SpreadsheetApp.Sheet}
  */
 function newSheet(channelId) {
   const spreadsheet = SpreadsheetApp.getActive();
-  const sheet = spreadsheet.insertSheet(channelId, spreadsheet.getNumSheets());
+  let sheet;
+
+  const template = spreadsheet.getSheetByName(TEMPLATE_SHEET_NAME);
+  if (template) {
+    sheet = template.copyTo(spreadsheet).setName(channelId);
+    sheet.protect().setDomainEdit(false);
+    sheet.getRange(1, 6).setValue(getStartOfWeek());
+    spreadsheet.setActiveSheet(sheet);
+    return sheet;
+  }
+
+  sheet = spreadsheet.insertSheet(channelId, spreadsheet.getNumSheets());
   sheet.protect().setDomainEdit(false);
 
   sheet.setColumnWidth(1, 200);
@@ -85,7 +99,7 @@ function newSheet(channelId) {
       ]
     );
 
-  refreshHosts(sheet);
+  return sheet;
 }
 
 /**
@@ -105,7 +119,8 @@ function addChannel() {
     return;
   }
 
-  newSheet(channelId);
+  const sheet = newSheet(channelId);
+  refreshHosts(sheet);
   slack.joinChannel(channelId);
 }
 
@@ -117,9 +132,11 @@ function reReadMembers() {
   const sheet = SpreadsheetApp.getActive().getActiveSheet();
   const sheetName = sheet.getName();
 
-  if (sheetName === TIMEZONES_SHEET_NAME) {
-    ui.alert(`You cannot do this with "${TIMEZONES_SHEET_NAME}"!`);
-    return;
+  for (const prohibitedSheetName of [TIMEZONES_SHEET_NAME, TEMPLATE_SHEET_NAME]) {
+    if (sheetName === prohibitedSheetName) {
+      ui.alert(`You cannot do this with "${prohibitedSheetName}"!`);
+      return;
+    }
   }
 
   const result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
@@ -183,9 +200,11 @@ function deleteChannel() {
   const sheet = SpreadsheetApp.getActive().getActiveSheet();
   const sheetName = sheet.getName();
 
-  if (sheetName === TIMEZONES_SHEET_NAME) {
-    ui.alert(`You cannot delete "${TIMEZONES_SHEET_NAME}"!`);
-    return;
+  for (const prohibitedSheetName of [TIMEZONES_SHEET_NAME, TEMPLATE_SHEET_NAME]) {
+    if (sheetName === prohibitedSheetName) {
+      ui.alert(`You cannot delete "${prohibitedSheetName}"!`);
+      return;
+    }
   }
 
   const result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);

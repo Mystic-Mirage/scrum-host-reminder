@@ -19,8 +19,10 @@ class Trigger {
    */
   findSheet() {
     const sheets = SpreadsheetApp.getActive().getSheets();
-    return sheets.find((sheet) => sheet.getName() !== TIMEZONES_SHEET_NAME &&
-      new Schedule(sheet).getTriggerUid() === this.triggerUid);
+    return sheets.find((sheet) =>
+      ![TIMEZONES_SHEET_NAME, TEMPLATE_SHEET_NAME].includes(sheet.getName()) &&
+      new Schedule(sheet).getTriggerUid() === this.triggerUid
+    );
   }
 
   /**
