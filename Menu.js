@@ -159,7 +159,7 @@ function refreshHosts(sheet) {
   newHosts.sort();
 
   for (const host of newHosts) {
-    if (!host[3] === null) {
+    if (host[3] === null) {
       host[3] = new Date();
     }
   }
