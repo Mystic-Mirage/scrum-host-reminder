@@ -141,7 +141,7 @@ function reReadMembers() {
 
   const result = ui.alert("Confirm", "Re-read the channel members?", ui.ButtonSet.YES_NO);
 
-  if (result === ui.Button.NO) return;
+  if (result !== ui.Button.YES) return;
 
   refreshHosts(sheet);
 }
@@ -208,7 +208,7 @@ function deleteChannel() {
   }
 
   const result = ui.alert("Confirm", "Are you sure you want to delete the channel?", ui.ButtonSet.YES_NO);
-  if (result === ui.Button.NO) return;
+  if (result !== ui.Button.YES) return;
 
   const channelId = ui.prompt("Confirm by entering channel ID").getResponseText();
   if (!channelId) return;
