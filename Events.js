@@ -137,7 +137,7 @@ function doPost(e) {
             scheduleData = new Schedule(sheet).getScheduleData(true);
             message = Slack.settingsSchedule(scheduleData);
             new Slack().responseMessage(payload.response_url, message);
-            new Trigger().replace(sheet);
+            new Trigger(scheduleData.triggerUid).replace(sheet);
           }
           break;
         case "clear-time":
@@ -147,7 +147,7 @@ function doPost(e) {
             scheduleData = new Schedule(sheet).getScheduleData(true);
             message = Slack.settingsSchedule(scheduleData);
             new Slack().responseMessage(payload.response_url, message);
-            new Trigger().replace(sheet);
+            new Trigger(scheduleData.triggerUid).replace(sheet);
           }
           break;
         case "set-timezone":
@@ -157,7 +157,7 @@ function doPost(e) {
             scheduleData = new Schedule(sheet).getScheduleData(true);
             message = Slack.settingsSchedule(scheduleData);
             new Slack().responseMessage(payload.response_url, message);
-            new Trigger().replace(sheet);
+            new Trigger(scheduleData.triggerUid).replace(sheet);
           }
           break;
         case "set-start-point":
@@ -167,27 +167,27 @@ function doPost(e) {
             scheduleData = new Schedule(sheet).getScheduleData(true);
             message = Slack.settingsSchedule(scheduleData);
             new Slack().responseMessage(payload.response_url, message);
-            new Trigger().replace(sheet);
+            new Trigger(scheduleData.triggerUid).replace(sheet);
           }
           break;
         case "add-week":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           if (sheet) {
-            new Schedule(sheet).addWeek();
+            Schedule.addWeek(sheet);
             scheduleData = new Schedule(sheet).getScheduleData(true);
             message = Slack.settingsSchedule(scheduleData);
             new Slack().responseMessage(payload.response_url, message);
-            new Trigger().replace(sheet);
+            new Trigger(scheduleData.triggerUid).replace(sheet);
           }
           break;
         case "remove-week":
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           if (sheet) {
-            new Schedule(sheet).removeWeek();
+            Schedule.removeWeek(sheet);
             scheduleData = new Schedule(sheet).getScheduleData(true);
             message = Slack.settingsSchedule(scheduleData);
             new Slack().responseMessage(payload.response_url, message);
-            new Trigger().replace(sheet);
+            new Trigger(scheduleData.triggerUid).replace(sheet);
           }
           break;
         case "toggle-day-0":
@@ -200,11 +200,11 @@ function doPost(e) {
           sheet = SpreadsheetApp.getActive().getSheetByName(payload.channel.id);
           if (sheet) {
             const [week, day] = JSON.parse(action.value);
-            new Schedule(sheet).toggleDay(week, day);
+            Schedule.toggleDay(sheet, week, day);
             scheduleData = new Schedule(sheet).getScheduleData(true);
             message = Slack.settingsSchedule(scheduleData);
             new Slack().responseMessage(payload.response_url, message);
-            new Trigger().replace(sheet);
+            new Trigger(scheduleData.triggerUid).replace(sheet);
           }
           break;
         case "close-settings":

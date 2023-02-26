@@ -35,6 +35,7 @@ function getNow() {
  * @property {Date} startPoint
  * @property {Date} timeAt
  * @property {string} timeZone
+ * @property {string} triggerUid
  * @property {boolean[]} schedule
  * @property {boolean[][]} weeks
  */
@@ -60,7 +61,7 @@ class Schedule {
    */
   getScheduleData(force = false) {
     const rows = this.sheet.getDataRange().getValues();
-    const [startPoint, timeAt, timeZone] = rows[0].slice(5);
+    const [startPoint, timeAt, timeZone, triggerUid] = rows[0].slice(5);
 
     if (!(force || startPoint && timeAt && timeZone)) return null;
 
@@ -75,7 +76,7 @@ class Schedule {
       weeks.push(days);
     }
 
-    return {startPoint, timeAt, timeZone, schedule, weeks};
+    return {startPoint, timeAt, timeZone, triggerUid, schedule, weeks};
   }
 
   /**
@@ -171,12 +172,14 @@ class Schedule {
 
   /**
    * Add a week to a schedule
+   *
+   * @param {SpreadsheetApp.Sheet} sheet
    */
-  addWeek() {
+  static addWeek(sheet) {
     /** @type {SpreadsheetApp.Range} */
     let prev;
-    for (let i = 2; i < this.sheet.getMaxRows(); i++) {
-      const range = this.sheet.getRange(i, 6, 1, 7);
+    for (let i = 2; i < sheet.getMaxRows(); i++) {
+      const range = sheet.getRange(i, 6, 1, 7);
       if (range.getValue() === "") {
         if (prev.getRow()) {
           prev.copyTo(range);
@@ -190,12 +193,14 @@ class Schedule {
 
   /**
    * Remove a week from a schedule
+   *
+   * @param {SpreadsheetApp.Sheet} sheet
    */
-  removeWeek() {
+  static removeWeek(sheet) {
     /** @type {SpreadsheetApp.Range} */
     let prev;
-    for (let i = 3; i < this.sheet.getMaxRows(); i++) {
-      const range = this.sheet.getRange(i, 6, 1, 7);
+    for (let i = 3; i < sheet.getMaxRows(); i++) {
+      const range = sheet.getRange(i, 6, 1, 7);
       if (range.getValue() === "") {
         if (prev) {
           prev.clearContent().removeCheckboxes();
@@ -210,11 +215,12 @@ class Schedule {
   /**
    * Toggle a day of week
    *
+   * @param {SpreadsheetApp.Sheet} sheet
    * @param {number} week
    * @param {number} day
    */
-  toggleDay(week, day) {
-    const range = this.sheet.getRange(week + 2, day + 6);
+  static toggleDay(sheet, week, day) {
+    const range = sheet.getRange(week + 2, day + 6);
     if (range.isChecked() !== null) {
       range.setValue(!range.getValue());
       SpreadsheetApp.flush();
