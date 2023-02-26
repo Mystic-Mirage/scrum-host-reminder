@@ -648,6 +648,8 @@ class Slack {
       );
     }
 
+    const active = scheduleData.startPoint && scheduleData.timeAt && scheduleData.timeZone && scheduleData.schedule.some((day) => day);
+
     return {
       text: "Schedule",
       blocks: [
@@ -658,7 +660,7 @@ class Slack {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "*Reminder schedule setup*",
+            text: `${active ? "🟢" : "🔴"} *Reminder schedule setup*`,
           },
           accessory: {
             type: "button",
