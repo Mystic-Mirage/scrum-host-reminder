@@ -175,8 +175,11 @@ function doPost(e) {
       }
     }
   } else if (e.postData.contents) {
-    /** @type {{type: "url_verification" | "event_callback", challenge?: string,
-     * api_app_id: string, event?: {type: "member_joined_channel" | "member_left_channel", channel: string, inviter?: string}}} */
+    /** @type {
+     * {type: "url_verification", challenge: string} |
+     * {type: "event_callback", api_app_id: string, event: {type: "member_joined_channel" | "member_left_channel", channel: string, inviter?: string}}
+     * }
+     */
     const contents = JSON.parse(e.postData.contents);
     console.log(contents);
 
@@ -193,7 +196,9 @@ function doPost(e) {
               if (!sheet) {
                 sheet = newSheet(contents.event.channel);
                 refreshHosts(sheet);
-                new Slack().sendEphemeral(contents.event.channel, contents.event.inviter);
+                if (contents.event.inviter) {
+                  new Slack().sendEphemeral(contents.event.channel, contents.event.inviter);
+                }
               }
               break;
             case "member_left_channel":
