@@ -159,7 +159,6 @@ function refreshHosts(sheet) {
 
   const newHosts = [];
   for (const user of slack.usersList()) {
-    console.log(members);
     if (members.includes(user.id)) {
       const host = hosts.find((host) => host.slackId === user.id);
       if (host) {
