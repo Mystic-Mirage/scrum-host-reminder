@@ -177,7 +177,7 @@ function doPost(e) {
   } else if (e.postData.contents) {
     /** @type {
      * {type: "url_verification", challenge: string} |
-     * {type: "event_callback", api_app_id: string, event: {type: "member_joined_channel" | "member_left_channel", channel: string, inviter?: string}}
+     * {type: "event_callback", event: {type: "member_joined_channel" | "member_left_channel", user: string, channel: string, inviter?: string}}
      * }
      */
     const contents = JSON.parse(e.postData.contents);
@@ -189,7 +189,9 @@ function doPost(e) {
         return ContentService.createTextOutput(contents.challenge);
       case "event_callback":
         const props = PropertiesService.getScriptProperties().getProperties();
-        if (contents.api_app_id === props.SLACK_APP_ID) {
+        const slack = new Slack();
+        const user = slack.getUserInfo(contents.event.user);
+        if (user.is_bot && user.profile.api_app_id === props.SLACK_APP_ID) {
           switch (contents.event.type) {
             case "member_joined_channel":
               sheet = SpreadsheetApp.getActive().getSheetByName(contents.event.channel);
@@ -197,7 +199,7 @@ function doPost(e) {
                 sheet = newSheet(contents.event.channel);
                 refreshHosts(sheet);
                 if (contents.event.inviter) {
-                  new Slack().sendEphemeral(contents.event.channel, contents.event.inviter);
+                  slack.sendEphemeral(contents.event.channel, contents.event.inviter);
                 }
               }
               break;

@@ -195,7 +195,7 @@ class Slack {
    * Get user info by user ID
    *
    * @param {string} userId
-   * @returns {{real_name: string, is_bot: boolean}}
+   * @returns {{is_bot: boolean, profile: {api_app_id?: string}}}
    */
   getUserInfo(userId) {
     const result = this.getApi("users.info", {user: userId});
