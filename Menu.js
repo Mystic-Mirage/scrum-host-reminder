@@ -211,8 +211,8 @@ function deleteChannel() {
   deleteSheet(sheet);
 
   const slack = new Slack();
-  slack.leaveChannel(channelId);
   slack.disarmLastMessage(channelId);
+  slack.leaveChannel(channelId);
 }
 
 /**
