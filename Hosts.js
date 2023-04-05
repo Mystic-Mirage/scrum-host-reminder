@@ -106,3 +106,8 @@ class Hosts {
     }
   }
 }
+
+function debugGetNext() {
+  const sheet = SpreadsheetApp.getActive().getSheets()[1];
+  new Hosts(sheet).getNext();
+}

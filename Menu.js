@@ -164,7 +164,7 @@ function refreshHosts(sheet) {
       if (host) {
         newHosts.push([user.real_name, user.id, host.active, host.timestamp]);
       } else {
-        newHosts.push([user.real_name, user.id, false, null]);
+        newHosts.push([user.real_name, user.id, false, ""]);
       }
     }
 
@@ -173,12 +173,6 @@ function refreshHosts(sheet) {
   }
 
   newHosts.sort();
-
-  for (const host of newHosts) {
-    if (host[3] === null) {
-      host[3] = new Date();
-    }
-  }
 
   const hostsDiff = newHosts.length - hosts.length;
   if (hostsDiff < 0) {
