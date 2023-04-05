@@ -181,7 +181,7 @@ function refreshHosts(sheet) {
     sheet.getRange(hosts.length + 1, 3, hostsDiff, 1).insertCheckboxes();
   }
 
-  sheet.getRange(1, 1,newHosts.length, 4).setValues(newHosts);
+  sheet.getRange(1, 1, newHosts.length, 4).setValues(newHosts);
 }
 
 /**
