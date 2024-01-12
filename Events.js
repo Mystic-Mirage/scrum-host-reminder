@@ -166,8 +166,6 @@ function doPost(e) {
       } else {
         switch (action.action_id) {
           case "next-host":
-            new Slack().disarmMessage(payload.message, payload.response_url);
-            break;
           case "skip-meeting":
             new Slack().disarmMessage(payload.message, payload.response_url);
             break;
