@@ -119,7 +119,7 @@ class Schedule {
    * @returns {string}
    */
   getTriggerUid() {
-    return this.triggerRange.getValue().toString();
+    return this.triggerRange.getValue().toString().replace(/^'/, "");
   }
 
   /**
@@ -128,7 +128,7 @@ class Schedule {
    * @param {string} triggerUid
    */
   setTriggerUid(triggerUid) {
-    this.triggerRange.setValue(triggerUid);
+    this.triggerRange.setValue("'" + triggerUid);
     SpreadsheetApp.flush();
   }
 
